@@ -516,7 +516,9 @@ section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
 }
 
 .hourly-cards {
-  display: flex;
+  /* display: flex; */
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 10px;
   overflow-x: auto;
   padding: 2px 2px 10px;
@@ -771,7 +773,7 @@ footer {
   }
 
   .current-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -833,7 +835,7 @@ footer {
   }
 
   .daily-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .sun-grid {
@@ -1123,7 +1125,8 @@ footer {
 ========================= */
 @media (max-width: 360px) {
   .current-grid {
-    grid-template-columns: 1fr 1fr;
+    /* grid-template-columns: 1fr 1fr; */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     margin-top: 5px;
   }
 
@@ -1187,7 +1190,7 @@ footer {
   .hourly-cards {
     display: grid;
     scrollbar-width: none;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .hourly-cards::-webkit-scrollbar {
