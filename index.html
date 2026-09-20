@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08131f">
+  <meta name="description" content="Pronóstico meteorológico para Villa Pehuenia y otras localidades: temperatura, viento, ráfagas, lluvia, nieve y más.">
+  <title>Meteo Pehuenia | Pronóstico meteorológico</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Inicio">
+        <span class="brand-icon">⛰️</span>
+        <span>
+          <strong>Meteo Pehuenia</strong>
+          <small>Pronóstico para montaña y 4x4</small>
+        </span>
+      </a>
+
+      <button id="btnRefresh" class="icon-btn" type="button" title="Actualizar pronóstico" aria-label="Actualizar">
+        ↻
+      </button>
+    </header>
+
+    <main>
+      <section class="hero panel">
+        <div>
+          <p class="eyebrow">CONDICIONES METEOROLÓGICAS</p>
+          <h1 id="locationTitle">Villa Pehuenia</h1>
+          <p id="locationSubtitle">Neuquén, Argentina</p>
+        </div>
+
+        <form id="searchForm" class="search-box">
+          <label class="sr-only" for="searchInput">Buscar localidad</label>
+          <input id="searchInput" type="search" placeholder="Buscar localidad..." autocomplete="off">
+          <button type="submit">Buscar</button>
+        </form>
+
+        <div id="searchResults" class="search-results hidden"></div>
+      </section>
+
+      <section id="statusBox" class="status hidden"></section>
+
+      <section class="current-grid">
+        <article class="current-main panel">
+          <div class="weather-main">
+            <div id="currentWeatherIcon" class="weather-icon">☀️</div>
+            <div>
+              <p class="label">AHORA</p>
+              <div class="temperature-line">
+                <span id="currentTemp">--</span><sup>°C</sup>
+              </div>
+              <p id="currentDescription" class="weather-description">Cargando...</p>
+              <p class="feels">Sensación térmica: <strong id="currentFeels">-- °C</strong></p>
+            </div>
+          </div>
+
+          <div class="current-meta">
+            <div><span>Actualizado</span><strong id="updatedTime">--</strong></div>
+            <div><span>Altitud modelo</span><strong id="elevation">-- m</strong></div>
+          </div>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">💨</span>
+          <span class="metric-label">Viento</span>
+          <strong id="windSpeed">--</strong>
+          <small>km/h</small>
+          <span id="windDirection" class="metric-extra">--</span>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">🌬️</span>
+          <span class="metric-label">Ráfagas</span>
+          <strong id="windGust">--</strong>
+          <small>km/h</small>
+          <span id="windLevel" class="metric-extra">--</span>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">💧</span>
+          <span class="metric-label">Humedad</span>
+          <strong id="humidity">--</strong>
+          <small>%</small>
+          <span id="dewPoint" class="metric-extra">P. rocío: --</span>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">🌧️</span>
+          <span class="metric-label">Precipitación</span>
+          <strong id="precipitation">--</strong>
+          <small>mm</small>
+          <span id="precipProbability" class="metric-extra">Prob.: --</span>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">❄️</span>
+          <span class="metric-label">Nieve</span>
+          <strong id="snowfall">--</strong>
+          <small>cm</small>
+          <span class="metric-extra">Última hora</span>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">☁️</span>
+          <span class="metric-label">Nubosidad</span>
+          <strong id="cloudCover">--</strong>
+          <small>%</small>
+          <span id="visibility" class="metric-extra">Visib.: --</span>
+        </article>
+
+        <article class="metric panel">
+          <span class="metric-icon">🧭</span>
+          <span class="metric-label">Presión</span>
+          <strong id="pressure">--</strong>
+          <small>hPa</small>
+          <span class="metric-extra">Nivel del mar</span>
+        </article>
+      </section>
+
+      <section class="panel activity-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">EVALUACIÓN RÁPIDA</p>
+            <h2>Condiciones para excursión 4x4</h2>
+          </div>
+          <span id="activityBadge" class="activity-badge neutral">Analizando</span>
+        </div>
+        <p id="activityText">Evaluando viento, precipitación, temperatura y visibilidad...</p>
+        <p class="disclaimer">Orientativo: no reemplaza alertas oficiales, evaluación del terreno ni decisiones de seguridad.</p>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">PRÓXIMAS 48 HORAS</p>
+            <h2>Temperatura, viento y ráfagas</h2>
+          </div>
+          <select id="chartMode" aria-label="Variable del gráfico">
+            <option value="temp">Temperatura</option>
+            <option value="wind">Viento</option>
+            <option value="precip">Precipitación</option>
+          </select>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="weatherChart"></canvas>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">DETALLE HORARIO</p>
+            <h2>Próximas horas</h2>
+          </div>
+        </div>
+        <div id="hourlyCards" class="hourly-cards"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">TENDENCIA</p>
+            <h2>Pronóstico de 7 días</h2>
+          </div>
+        </div>
+        <div id="dailyForecast" class="daily-grid"></div>
+      </section>
+
+      <section class="sun-grid">
+        <article class="panel sun-card">
+          <span>🌅</span>
+          <div><small>Amanecer</small><strong id="sunrise">--:--</strong></div>
+        </article>
+        <article class="panel sun-card">
+          <span>🌇</span>
+          <div><small>Atardecer</small><strong id="sunset">--:--</strong></div>
+        </article>
+        <article class="panel sun-card">
+          <span>☀️</span>
+          <div><small>Índice UV máx.</small><strong id="uvIndex">--</strong></div>
+        </article>
+      </section>
+
+      <section class="panel location-panel">
+        <div>
+          <p class="eyebrow">UBICACIÓN MANUAL</p>
+          <h2>Cambiar coordenadas</h2>
+          <p>Útil para consultar pasos, lagos, refugios o puntos de una travesía.</p>
+        </div>
+        <form id="coordsForm" class="coords-form">
+          <label>Latitud
+            <input id="latInput" type="number" step="any" required>
+          </label>
+          <label>Longitud
+            <input id="lonInput" type="number" step="any" required>
+          </label>
+          <button type="submit">Consultar</button>
+        </form>
+      </section>
+
+      <section class="model-note">
+        <p>
+          Datos meteorológicos provistos por <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.
+          El pronóstico es orientativo y puede variar según el relieve y el modelo meteorológico.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <span>Meteo Pehuenia</span>
+      <span>•</span>
+      <span id="footerYear"></span>
+    </footer>
+  </div>
+</body>
+</html>
