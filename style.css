@@ -157,6 +157,10 @@ main {
   z-index: 9999;
 }
 
+#hero2 {
+  margin-top: 5px;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--accent);
@@ -1120,6 +1124,7 @@ footer {
 @media (max-width: 360px) {
   .current-grid {
     grid-template-columns: 1fr 1fr;
+    margin-top: 5px;
   }
 
   .temperature-line span {
@@ -1148,6 +1153,7 @@ footer {
 
   .current-grid {
     grid-template-columns: minmax(330px, 2fr) repeat(4, minmax(150px, 1fr));
+    margin-top: 5px;
   }
 }
 
@@ -1157,6 +1163,25 @@ footer {
   select,
   input {
     min-height: 42px;
+  }
+
+  .current-grid {
+    margin-top: 5px;
+  }
+  .activity-panel,
+  .chart-panel,
+  .sun-grid,
+  section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
+    margin-top: 5px;
+    /* padding: 16px; */
+    /* border-radius: 17px; */
+  }
+
+  .sun-grid,
+  .current-grid,
+  .hourly-cards,
+  .daily-grid {
+    gap: 5px;
   }
 
   .hourly-cards {
