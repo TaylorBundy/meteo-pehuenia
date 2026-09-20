@@ -1,0 +1,74 @@
+[
+  {
+    "id": "villa-pehuenia",
+    "nombre": "Villa Pehuenia",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.884,
+    "longitud": -71.171
+  },
+  {
+    "id": "moquehue",
+    "nombre": "Moquehue",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.925,
+    "longitud": -71.189
+  },
+  {
+    "id": "paso-del-arco",
+    "nombre": "Paso del Arco",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.816,
+    "longitud": -71.052
+  },
+  {
+    "id": "paso-del-arco-corfone",
+    "nombre": "Paso del Arco entrada corfone",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.802502,
+    "longitud": -71.059154
+  },
+  {
+    "id": "paso-del-arco-ix23",
+    "nombre": "Paso del Arco hito ix23",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.8028362,
+    "longitud": -71.1716773
+  },
+  {
+    "id": "paso-del-arco-ix24",
+    "nombre": "Paso del Arco hito ix24",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.777009,
+    "longitud": -71.122844
+  },
+  {
+    "id": "paso-del-arco-ix25",
+    "nombre": "Paso del Arco hito ix25",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.759609,
+    "longitud": -71.085051
+  },
+  {
+    "id": "batea-mahuida",
+    "nombre": "Batea Mahuida",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.823,
+    "longitud": -71.1
+  },
+  {
+    "id": "alumine",
+    "nombre": "Aluminé",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -39.236,
+    "longitud": -70.919
+  }
+]

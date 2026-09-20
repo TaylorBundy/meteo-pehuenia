@@ -3,7 +3,7 @@ const DEFAULT_LOCATION = {
   admin: "Neuquén",
   country: "Argentina",
   latitude: -38.884,
-  longitude: -71.171
+  longitude: -71.171,
 };
 
 let selectedLocation = { ...DEFAULT_LOCATION };
@@ -12,22 +12,134 @@ let chart = null;
 
 const $ = (id) => document.getElementById(id);
 
+let ubicaciones = [];
+
+async function cargarUbicaciones() {
+  const select = document.getElementById("locationSelect");
+
+  if (!select) {
+    console.error("No se encontró #locationSelect");
+    return;
+  }
+
+  try {
+    const respuesta = await fetch("data/ubicaciones.json");
+
+    if (!respuesta.ok) {
+      throw new Error(
+        `No se pudo cargar ubicaciones.json (${respuesta.status})`,
+      );
+    }
+
+    ubicaciones = await respuesta.json();
+
+    select.innerHTML = "";
+
+    const opcionInicial = document.createElement("option");
+    opcionInicial.value = "";
+    opcionInicial.textContent = "Seleccionar ubicación...";
+    select.appendChild(opcionInicial);
+
+    ubicaciones.forEach((ubicacion) => {
+      const option = document.createElement("option");
+
+      option.value = ubicacion.id;
+      option.textContent = ubicacion.nombre;
+
+      select.appendChild(option);
+    });
+
+    // Intentar recuperar la última ubicación utilizada
+    const ubicacionGuardada = localStorage.getItem("meteo-ubicacion-id");
+
+    if (ubicacionGuardada) {
+      const existe = ubicaciones.some(
+        (ubicacion) => ubicacion.id === ubicacionGuardada,
+      );
+
+      if (existe) {
+        select.value = ubicacionGuardada;
+        seleccionarUbicacion(ubicacionGuardada);
+      }
+    }
+  } catch (error) {
+    console.error("Error cargando ubicaciones:", error);
+
+    select.innerHTML = "";
+
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Error al cargar ubicaciones";
+
+    select.appendChild(option);
+  }
+}
+
+function seleccionarUbicacion(id) {
+  const ubicacion = ubicaciones.find((item) => item.id === id);
+
+  if (!ubicacion) {
+    console.error("Ubicación no encontrada:", id);
+    return;
+  }
+
+  selectedLocation = {
+    name: ubicacion.nombre,
+    admin: ubicacion.provincia,
+    country: ubicacion.pais,
+    latitude: ubicacion.latitud,
+    longitude: ubicacion.longitud,
+  };
+
+  // Guardar selección
+  localStorage.setItem("meteo-ubicacion-id", ubicacion.id);
+
+  // Actualizar interfaz
+  updateLocationHeader();
+
+  setCoordinateInputs();
+
+  // Obtener nuevo pronóstico
+  loadWeather();
+}
+
+const locationSelect = document.getElementById("locationSelect");
+
+// if (locationSelect) {
+//   locationSelect.addEventListener("change", function () {
+//     if (!this.value) return;
+
+//     seleccionarUbicacion(this.value);
+//   });
+// }
+
 document.addEventListener("DOMContentLoaded", () => {
   $("footerYear").textContent = new Date().getFullYear();
 
   const saved = localStorage.getItem("meteo-location");
   if (saved) {
-    try { selectedLocation = JSON.parse(saved); } catch (_) {}
+    try {
+      selectedLocation = JSON.parse(saved);
+    } catch (_) {}
   }
 
   setCoordinateInputs();
   updateLocationHeader();
+  cargarUbicaciones();
   loadWeather();
 
   $("btnRefresh").addEventListener("click", loadWeather);
   $("chartMode").addEventListener("change", renderChart);
   $("searchForm").addEventListener("submit", handleSearch);
   $("coordsForm").addEventListener("submit", handleCoords);
+
+  if (locationSelect) {
+    locationSelect.addEventListener("change", function () {
+      if (!this.value) return;
+
+      seleccionarUbicacion(this.value);
+    });
+  }
 
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".hero")) {
@@ -54,7 +166,7 @@ async function loadWeather() {
         "pressure_msl",
         "wind_speed_10m",
         "wind_direction_10m",
-        "wind_gusts_10m"
+        "wind_gusts_10m",
       ].join(","),
       hourly: [
         "temperature_2m",
@@ -70,7 +182,7 @@ async function loadWeather() {
         "pressure_msl",
         "wind_speed_10m",
         "wind_direction_10m",
-        "wind_gusts_10m"
+        "wind_gusts_10m",
       ].join(","),
       daily: [
         "weather_code",
@@ -87,15 +199,17 @@ async function loadWeather() {
         "precipitation_probability_max",
         "wind_speed_10m_max",
         "wind_gusts_10m_max",
-        "wind_direction_10m_dominant"
+        "wind_direction_10m_dominant",
       ].join(","),
       timezone: "auto",
       forecast_days: "7",
       wind_speed_unit: "kmh",
-      precipitation_unit: "mm"
+      precipitation_unit: "mm",
     });
 
-    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?${params}`,
+    );
     if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
     weatherData = await response.json();
@@ -103,7 +217,10 @@ async function loadWeather() {
     hideStatus();
   } catch (error) {
     console.error(error);
-    setStatus("No se pudo obtener el pronóstico. Revisá tu conexión e intentá nuevamente.", true);
+    setStatus(
+      "No se pudo obtener el pronóstico. Revisá tu conexión e intentá nuevamente.",
+      true,
+    );
   } finally {
     $("btnRefresh").disabled = false;
   }
@@ -130,18 +247,21 @@ function renderCurrent() {
 
   $("windSpeed").textContent = round(c.wind_speed_10m);
   $("windGust").textContent = round(c.wind_gusts_10m);
-  $("windDirection").textContent = `${degreesToCompass(c.wind_direction_10m)} · ${round(c.wind_direction_10m)}°`;
+  $("windDirection").textContent =
+    `${degreesToCompass(c.wind_direction_10m)} · ${round(c.wind_direction_10m)}°`;
   $("windLevel").textContent = windDescription(c.wind_gusts_10m);
 
   $("humidity").textContent = round(c.relative_humidity_2m);
   $("dewPoint").textContent = `P. rocío: ${round(h.dew_point_2m[idx])} °C`;
 
   $("precipitation").textContent = format1(c.precipitation);
-  $("precipProbability").textContent = `Prob.: ${round(h.precipitation_probability[idx])}%`;
+  $("precipProbability").textContent =
+    `Prob.: ${round(h.precipitation_probability[idx])}%`;
   $("snowfall").textContent = format1(h.snowfall[idx]);
 
   $("cloudCover").textContent = round(c.cloud_cover);
-  $("visibility").textContent = `Visib.: ${formatVisibility(h.visibility[idx])}`;
+  $("visibility").textContent =
+    `Visib.: ${formatVisibility(h.visibility[idx])}`;
   $("pressure").textContent = round(c.pressure_msl);
 
   $("updatedTime").textContent = formatTime(c.time);
@@ -162,20 +282,45 @@ function renderActivity() {
   let severity = 0;
   const reasons = [];
 
-  if (gust >= 70) { severity += 3; reasons.push(`ráfagas muy fuertes (${round(gust)} km/h)`); }
-  else if (gust >= 50) { severity += 2; reasons.push(`ráfagas fuertes (${round(gust)} km/h)`); }
-  else if (gust >= 35) { severity += 1; reasons.push(`viento con ráfagas moderadas (${round(gust)} km/h)`); }
+  if (gust >= 70) {
+    severity += 3;
+    reasons.push(`ráfagas muy fuertes (${round(gust)} km/h)`);
+  } else if (gust >= 50) {
+    severity += 2;
+    reasons.push(`ráfagas fuertes (${round(gust)} km/h)`);
+  } else if (gust >= 35) {
+    severity += 1;
+    reasons.push(`viento con ráfagas moderadas (${round(gust)} km/h)`);
+  }
 
-  if (precip >= 5) { severity += 2; reasons.push("precipitación intensa"); }
-  else if (precip >= 1) { severity += 1; reasons.push("precipitación presente"); }
+  if (precip >= 5) {
+    severity += 2;
+    reasons.push("precipitación intensa");
+  } else if (precip >= 1) {
+    severity += 1;
+    reasons.push("precipitación presente");
+  }
 
-  if (snow >= 1) { severity += 2; reasons.push("nevada"); }
-  else if (snow > 0) { severity += 1; reasons.push("posible nieve"); }
+  if (snow >= 1) {
+    severity += 2;
+    reasons.push("nevada");
+  } else if (snow > 0) {
+    severity += 1;
+    reasons.push("posible nieve");
+  }
 
-  if (visibility > 0 && visibility < 2000) { severity += 2; reasons.push("visibilidad reducida"); }
-  else if (visibility > 0 && visibility < 5000) { severity += 1; reasons.push("visibilidad limitada"); }
+  if (visibility > 0 && visibility < 2000) {
+    severity += 2;
+    reasons.push("visibilidad reducida");
+  } else if (visibility > 0 && visibility < 5000) {
+    severity += 1;
+    reasons.push("visibilidad limitada");
+  }
 
-  if (temp <= -5) { severity += 1; reasons.push("temperatura muy baja"); }
+  if (temp <= -5) {
+    severity += 1;
+    reasons.push("temperatura muy baja");
+  }
 
   const badge = $("activityBadge");
   badge.className = "activity-badge";
@@ -183,11 +328,13 @@ function renderActivity() {
   if (severity >= 4) {
     badge.textContent = "Precaución alta";
     badge.classList.add("bad");
-    $("activityText").textContent = `Hay factores meteorológicos que requieren especial atención: ${reasons.join(", ")}. Verificá alertas oficiales y estado de caminos antes de salir.`;
+    $("activityText").textContent =
+      `Hay factores meteorológicos que requieren especial atención: ${reasons.join(", ")}. Verificá alertas oficiales y estado de caminos antes de salir.`;
   } else if (severity >= 2) {
     badge.textContent = "Con precaución";
     badge.classList.add("caution");
-    $("activityText").textContent = `Las condiciones presentan algunos factores a considerar: ${reasons.join(", ")}. Conviene revisar la evolución horaria antes de una salida.`;
+    $("activityText").textContent =
+      `Las condiciones presentan algunos factores a considerar: ${reasons.join(", ")}. Conviene revisar la evolución horaria antes de una salida.`;
   } else {
     badge.textContent = "Sin señales severas";
     badge.classList.add("good");
@@ -273,16 +420,16 @@ function renderChart() {
         label: "Viento (km/h)",
         data: h.wind_speed_10m.slice(idx, end),
         borderWidth: 2,
-        tension: .3,
-        pointRadius: 0
+        tension: 0.3,
+        pointRadius: 0,
       },
       {
         label: "Ráfagas (km/h)",
         data: h.wind_gusts_10m.slice(idx, end),
         borderWidth: 2,
-        tension: .3,
-        pointRadius: 0
-      }
+        tension: 0.3,
+        pointRadius: 0,
+      },
     ];
   } else if (mode === "precip") {
     datasets = [
@@ -290,16 +437,16 @@ function renderChart() {
         type: "bar",
         label: "Precipitación (mm)",
         data: h.precipitation.slice(idx, end),
-        borderWidth: 1
+        borderWidth: 1,
       },
       {
         label: "Probabilidad (%)",
         data: h.precipitation_probability.slice(idx, end),
         borderWidth: 2,
-        tension: .3,
+        tension: 0.3,
         pointRadius: 0,
-        yAxisID: "y1"
-      }
+        yAxisID: "y1",
+      },
     ];
   } else {
     datasets = [
@@ -307,16 +454,16 @@ function renderChart() {
         label: "Temperatura (°C)",
         data: h.temperature_2m.slice(idx, end),
         borderWidth: 2,
-        tension: .3,
-        pointRadius: 0
+        tension: 0.3,
+        pointRadius: 0,
       },
       {
         label: "Sensación (°C)",
         data: h.apparent_temperature.slice(idx, end),
         borderWidth: 2,
-        tension: .3,
-        pointRadius: 0
-      }
+        tension: 0.3,
+        pointRadius: 0,
+      },
     ];
   }
 
@@ -324,13 +471,18 @@ function renderChart() {
 
   const scales = {
     x: {
-      ticks: { color: "#91a4b8", maxRotation: 0, autoSkip: true, maxTicksLimit: 12 },
-      grid: { color: "rgba(255,255,255,.04)" }
+      ticks: {
+        color: "#91a4b8",
+        maxRotation: 0,
+        autoSkip: true,
+        maxTicksLimit: 12,
+      },
+      grid: { color: "rgba(255,255,255,.04)" },
     },
     y: {
       ticks: { color: "#91a4b8" },
-      grid: { color: "rgba(255,255,255,.06)" }
-    }
+      grid: { color: "rgba(255,255,255,.06)" },
+    },
   };
 
   if (mode === "precip") {
@@ -339,7 +491,7 @@ function renderChart() {
       min: 0,
       max: 100,
       ticks: { color: "#91a4b8" },
-      grid: { drawOnChartArea: false }
+      grid: { drawOnChartArea: false },
     };
   }
 
@@ -355,11 +507,11 @@ function renderChart() {
         tooltip: {
           backgroundColor: "#07111c",
           borderColor: "rgba(255,255,255,.12)",
-          borderWidth: 1
-        }
+          borderWidth: 1,
+        },
       },
-      scales
-    }
+      scales,
+    },
   });
 }
 
@@ -375,10 +527,12 @@ async function handleSearch(event) {
       name: query,
       count: "8",
       language: "es",
-      format: "json"
+      format: "json",
     });
 
-    const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${params}`);
+    const response = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?${params}`,
+    );
     if (!response.ok) throw new Error("Error al buscar");
 
     const data = await response.json();
@@ -413,7 +567,7 @@ function renderSearchResults(results) {
         admin: result.admin1 || "",
         country: result.country || "",
         latitude: result.latitude,
-        longitude: result.longitude
+        longitude: result.longitude,
       };
       saveLocation();
       updateLocationHeader();
@@ -433,7 +587,14 @@ function handleCoords(event) {
   const lat = Number($("latInput").value);
   const lon = Number($("lonInput").value);
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+  if (
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lon) ||
+    lat < -90 ||
+    lat > 90 ||
+    lon < -180 ||
+    lon > 180
+  ) {
     setStatus("Ingresá coordenadas válidas.", true);
     return;
   }
@@ -443,7 +604,7 @@ function handleCoords(event) {
     admin: `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
     country: "",
     latitude: lat,
-    longitude: lon
+    longitude: lon,
   };
 
   saveLocation();
@@ -454,7 +615,9 @@ function handleCoords(event) {
 function updateLocationHeader() {
   $("locationTitle").textContent = selectedLocation.name;
   $("locationSubtitle").textContent =
-    [selectedLocation.admin, selectedLocation.country].filter(Boolean).join(", ") ||
+    [selectedLocation.admin, selectedLocation.country]
+      .filter(Boolean)
+      .join(", ") ||
     `${selectedLocation.latitude}, ${selectedLocation.longitude}`;
 }
 
@@ -521,7 +684,7 @@ function weatherCodeInfo(code) {
     86: ["Chaparrones de nieve intensos", "❄️"],
     95: ["Tormenta", "⛈️"],
     96: ["Tormenta con granizo", "⛈️"],
-    99: ["Tormenta fuerte con granizo", "⛈️"]
+    99: ["Tormenta fuerte con granizo", "⛈️"],
   };
   const item = table[code] || ["Condiciones variables", "🌤️"];
   return { label: item[0], icon: item[1] };
@@ -529,7 +692,24 @@ function weatherCodeInfo(code) {
 
 function degreesToCompass(deg) {
   if (!Number.isFinite(Number(deg))) return "--";
-  const dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
+  const dirs = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSO",
+    "SO",
+    "OSO",
+    "O",
+    "ONO",
+    "NO",
+    "NNO",
+  ];
   return dirs[Math.round((Number(deg) % 360) / 22.5) % 16];
 }
 
@@ -551,7 +731,10 @@ function formatVisibility(meters) {
 
 function formatTime(iso) {
   if (!iso) return "--";
-  return new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function round(value) {
