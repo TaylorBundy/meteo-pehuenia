@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: meteo-pehuenia-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: GITHUB_TOKEN
+        sync: false
+
+      - key: GITHUB_REPO
+        value: TaylorBundy/meteo-pehuenia
+
+      - key: GITHUB_FILE_PATH
+        value: data/ubicaciones.json
+
+      - key: GITHUB_BRANCH
+        value: main
+
+      - key: ALLOWED_ORIGIN
+        value: https://taylorbundy.github.io

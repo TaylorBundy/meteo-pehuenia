@@ -14,6 +14,42 @@ const $ = (id) => document.getElementById(id);
 
 let ubicaciones = [];
 
+const locationModal = document.getElementById("locationModal");
+
+const closeLocationModal = document.getElementById("closeLocationModal");
+
+const cancelLocationModal = document.getElementById("cancelLocationModal");
+
+function abrirModalUbicacion() {
+  locationModal.classList.remove("hidden");
+
+  document.body.style.overflow = "hidden";
+
+  document.getElementById("locationName").focus();
+}
+
+function cerrarModalUbicacion() {
+  locationModal.classList.add("hidden");
+
+  document.body.style.overflow = "";
+}
+
+closeLocationModal.addEventListener("click", cerrarModalUbicacion);
+
+cancelLocationModal.addEventListener("click", cerrarModalUbicacion);
+
+locationModal.addEventListener("click", (event) => {
+  if (event.target === locationModal) {
+    cerrarModalUbicacion();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !locationModal.classList.contains("hidden")) {
+    cerrarModalUbicacion();
+  }
+});
+
 async function cargarUbicaciones() {
   const select = document.getElementById("locationSelect");
 
@@ -213,6 +249,7 @@ async function loadWeather() {
     if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
     weatherData = await response.json();
+    console.log(weatherData);
     renderAll();
     hideStatus();
   } catch (error) {

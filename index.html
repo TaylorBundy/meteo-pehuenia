@@ -18,6 +18,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style_popup.css" />
 
     <script
       src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
@@ -75,6 +76,13 @@
             <select id="locationSelect">
               <option value="">Cargando ubicaciones...</option>
             </select>
+            <button
+              type="button"
+              class="add-location-btn"
+              onclick="abrirModalUbicacion()"
+            >
+              ＋ Agregar ubicación
+            </button>
           </div>
         </section>
 
@@ -280,6 +288,147 @@
         <span>•</span>
         <span id="footerYear"></span>
       </footer>
+    </div>
+    <!-- MODAL NUEVA UBICACIÓN -->
+    <div id="locationModal" class="modal-overlay hidden">
+      <div class="location-modal">
+        <button
+          type="button"
+          id="closeLocationModal"
+          class="modal-close"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+        <div class="modal-header">
+          <div class="modal-icon">📍</div>
+
+          <div>
+            <p class="eyebrow">GESTIÓN DE UBICACIONES</p>
+            <h2>Nueva ubicación</h2>
+            <p>Agregá un nuevo punto para consultar su pronóstico.</p>
+          </div>
+        </div>
+
+        <form id="locationForm">
+          <div class="form-group">
+            <label for="locationName"> Nombre de la ubicación </label>
+
+            <input
+              type="text"
+              id="locationName"
+              placeholder="Ej: Lago Aluminé"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="locationProvince"> Provincia </label>
+
+              <input
+                type="text"
+                id="locationProvince"
+                value="Neuquén"
+                placeholder="Provincia"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="locationCountry"> País </label>
+
+              <input
+                type="text"
+                id="locationCountry"
+                value="Argentina"
+                placeholder="País"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="coordinates-header">
+            <div>
+              <span class="coordinates-title"> Coordenadas </span>
+
+              <span class="coordinates-help">
+                Necesarias para obtener el pronóstico
+              </span>
+            </div>
+
+            <button type="button" id="searchCoordinates" class="secondary-btn">
+              🔎 Buscar
+            </button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="locationLatitude"> Latitud </label>
+
+              <input
+                type="number"
+                id="locationLatitude"
+                step="any"
+                placeholder="-38.884"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="locationLongitude"> Longitud </label>
+
+              <input
+                type="number"
+                id="locationLongitude"
+                step="any"
+                placeholder="-71.171"
+                required
+              />
+            </div>
+          </div>
+
+          <div id="coordinateSearchBox" class="coordinate-search hidden">
+            <label for="coordinateSearchInput"> Buscar localidad </label>
+
+            <div class="search-inline">
+              <input
+                type="search"
+                id="coordinateSearchInput"
+                placeholder="Ej: Villa Pehuenia"
+              />
+
+              <button type="button" id="coordinateSearchButton">Buscar</button>
+            </div>
+
+            <div id="coordinateResults" class="coordinate-results"></div>
+          </div>
+
+          <div class="modal-preview">
+            <div class="preview-icon">📍</div>
+
+            <div>
+              <span>Vista previa</span>
+
+              <strong id="locationPreviewName"> Nueva ubicación </strong>
+
+              <small id="locationPreviewCoordinates">
+                Coordenadas no definidas
+              </small>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="cancelLocationModal" class="cancel-btn">
+              Cancelar
+            </button>
+
+            <button type="submit" class="save-btn">💾 Guardar ubicación</button>
+          </div>
+        </form>
+      </div>
     </div>
   </body>
 </html>

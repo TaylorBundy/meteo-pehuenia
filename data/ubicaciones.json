@@ -24,6 +24,38 @@
     "longitud": -71.052
   },
   {
+    "id": "paso-del-arco-quebrada",
+    "nombre": "Paso del Arco Quebrada Honda",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.8381989,
+    "longitud": -71.059186
+  },
+  {
+    "id": "paso-del-arco-corazon",
+    "nombre": "Paso del Arco Laguna Corazón",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.825366,
+    "longitud": -71.1400328
+  },
+  {
+    "id": "paso-del-arco-pinihue",
+    "nombre": "Paso del Arco Laguna Piñihue",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.8362546,
+    "longitud": -71.0996132
+  },
+  {
+    "id": "paso-del-arco-mirador-lagos",
+    "nombre": "Paso del Arco Mirador de los Lagos",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.8459456,
+    "longitud": -71.1825767
+  },
+  {
     "id": "paso-del-arco-corfone",
     "nombre": "Paso del Arco entrada corfone",
     "provincia": "Neuquén",
@@ -56,6 +88,14 @@
     "longitud": -71.085051
   },
   {
+    "id": "paso-del-arco-batea-norte",
+    "nombre": "Paso del Arco Laguna Batea Norte",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.8020933,
+    "longitud": -71.1777849
+  },
+  {
     "id": "batea-mahuida",
     "nombre": "Batea Mahuida",
     "provincia": "Neuquén",
@@ -70,5 +110,21 @@
     "pais": "Argentina",
     "latitud": -39.236,
     "longitud": -70.919
+  },
+  {
+    "id": "primeros-pinos",
+    "nombre": "Primeros Pinos",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.8463227,
+    "longitud": -70.5165933
+  },
+  {
+    "id": "primeros-pinos-atravesada",
+    "nombre": "Primeros Pinos La Atravesada",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.890427,
+    "longitud": -70.662536
   }
 ]
