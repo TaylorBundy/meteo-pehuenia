@@ -2,24 +2,34 @@ const DEFAULT_LOCATION = {
   name: "Villa Pehuenia",
   admin: "Neuquén",
   country: "Argentina",
-  latitude: -38.884,
-  longitude: -71.171,
+  // latitude: -38.884,
+  // longitude: -71.171,
+  latitude: -38.8910309,
+  longitude: -71.1969777,
 };
 const API_URL = "https://meteo-pehuenia.onrender.com";
+const $ = (id) => document.getElementById(id);
+const locationModal = document.getElementById("locationModal");
+const closeLocationModal = document.getElementById("closeLocationModal");
+const cancelLocationModal = document.getElementById("cancelLocationModal");
+const deleteLocationModal = document.getElementById("deleteLocationModal");
+const closeDeleteLocationModal = document.getElementById(
+  "closeDeleteLocationModal",
+);
+const cancelDeleteLocation = document.getElementById("cancelDeleteLocation");
+const confirmDeleteLocations = document.getElementById(
+  "confirmDeleteLocations",
+);
+const deleteLocationsList = document.getElementById("deleteLocationsList");
+const deleteLocationWarning = document.getElementById("deleteLocationWarning");
+const locationForm = document.getElementById("locationForm");
+const locationSelect = document.getElementById("locationSelect");
+const locationList = document.getElementById("editLocationsList");
 
 let selectedLocation = { ...DEFAULT_LOCATION };
 let weatherData = null;
 let chart = null;
-
-const $ = (id) => document.getElementById(id);
-
 let ubicaciones = [];
-
-const locationModal = document.getElementById("locationModal");
-
-const closeLocationModal = document.getElementById("closeLocationModal");
-
-const cancelLocationModal = document.getElementById("cancelLocationModal");
 
 function abrirModalUbicacion() {
   locationModal.classList.remove("hidden");
@@ -30,6 +40,8 @@ function abrirModalUbicacion() {
 }
 
 function cerrarModalUbicacion() {
+  const elementos = ["locationName", "locationLatitude", "locationLongitude"];
+  limpiarFormulario(locationModal, elementos);
   locationModal.classList.add("hidden");
 
   document.body.style.overflow = "";
@@ -54,22 +66,6 @@ document.addEventListener("keydown", (event) => {
 // =========================================================
 // MODAL ELIMINAR UBICACIONES
 // =========================================================
-
-const deleteLocationModal = document.getElementById("deleteLocationModal");
-
-const closeDeleteLocationModal = document.getElementById(
-  "closeDeleteLocationModal",
-);
-
-const cancelDeleteLocation = document.getElementById("cancelDeleteLocation");
-
-const confirmDeleteLocations = document.getElementById(
-  "confirmDeleteLocations",
-);
-
-const deleteLocationsList = document.getElementById("deleteLocationsList");
-
-const deleteLocationWarning = document.getElementById("deleteLocationWarning");
 
 // =========================================================
 // ABRIR
@@ -395,66 +391,66 @@ function actualizarSelectUbicaciones() {
   });
 }
 
-async function cargarUbicaciones2() {
-  const select = document.getElementById("locationSelect");
+// async function cargarUbicaciones2() {
+//   const select = document.getElementById("locationSelect");
 
-  if (!select) {
-    console.error("No se encontró #locationSelect");
-    return;
-  }
+//   if (!select) {
+//     console.error("No se encontró #locationSelect");
+//     return;
+//   }
 
-  try {
-    const respuesta = await fetch("data/ubicaciones.json");
+//   try {
+//     const respuesta = await fetch("data/ubicaciones.json");
 
-    if (!respuesta.ok) {
-      throw new Error(
-        `No se pudo cargar ubicaciones.json (${respuesta.status})`,
-      );
-    }
+//     if (!respuesta.ok) {
+//       throw new Error(
+//         `No se pudo cargar ubicaciones.json (${respuesta.status})`,
+//       );
+//     }
 
-    ubicaciones = await respuesta.json();
+//     ubicaciones = await respuesta.json();
 
-    select.innerHTML = "";
+//     select.innerHTML = "";
 
-    const opcionInicial = document.createElement("option");
-    opcionInicial.value = "";
-    opcionInicial.textContent = "Seleccionar ubicación...";
-    select.appendChild(opcionInicial);
+//     const opcionInicial = document.createElement("option");
+//     opcionInicial.value = "";
+//     opcionInicial.textContent = "Seleccionar ubicación...";
+//     select.appendChild(opcionInicial);
 
-    ubicaciones.forEach((ubicacion) => {
-      const option = document.createElement("option");
+//     ubicaciones.forEach((ubicacion) => {
+//       const option = document.createElement("option");
 
-      option.value = ubicacion.id;
-      option.textContent = ubicacion.nombre;
+//       option.value = ubicacion.id;
+//       option.textContent = ubicacion.nombre;
 
-      select.appendChild(option);
-    });
+//       select.appendChild(option);
+//     });
 
-    // Intentar recuperar la última ubicación utilizada
-    const ubicacionGuardada = localStorage.getItem("meteo-ubicacion-id");
+//     // Intentar recuperar la última ubicación utilizada
+//     const ubicacionGuardada = localStorage.getItem("meteo-ubicacion-id");
 
-    if (ubicacionGuardada) {
-      const existe = ubicaciones.some(
-        (ubicacion) => ubicacion.id === ubicacionGuardada,
-      );
+//     if (ubicacionGuardada) {
+//       const existe = ubicaciones.some(
+//         (ubicacion) => ubicacion.id === ubicacionGuardada,
+//       );
 
-      if (existe) {
-        select.value = ubicacionGuardada;
-        seleccionarUbicacion(ubicacionGuardada);
-      }
-    }
-  } catch (error) {
-    console.error("Error cargando ubicaciones:", error);
+//       if (existe) {
+//         select.value = ubicacionGuardada;
+//         seleccionarUbicacion(ubicacionGuardada);
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error cargando ubicaciones:", error);
 
-    select.innerHTML = "";
+//     select.innerHTML = "";
 
-    const option = document.createElement("option");
-    option.value = "";
-    option.textContent = "Error al cargar ubicaciones";
+//     const option = document.createElement("option");
+//     option.value = "";
+//     option.textContent = "Error al cargar ubicaciones";
 
-    select.appendChild(option);
-  }
-}
+//     select.appendChild(option);
+//   }
+// }
 
 async function cargarUbicaciones() {
   const select = document.getElementById("locationSelect");
@@ -547,8 +543,6 @@ async function cargarUbicaciones() {
     select.innerHTML = "<option value=''>Error al cargar ubicaciones</option>";
   }
 }
-
-const locationForm = document.getElementById("locationForm");
 
 locationForm.addEventListener("submit", guardarUbicacion);
 
@@ -730,8 +724,6 @@ function seleccionarUbicacion(id) {
   loadWeather();
 }
 
-const locationSelect = document.getElementById("locationSelect");
-
 // if (locationSelect) {
 //   locationSelect.addEventListener("change", function () {
 //     if (!this.value) return;
@@ -739,6 +731,346 @@ const locationSelect = document.getElementById("locationSelect");
 //     seleccionarUbicacion(this.value);
 //   });
 // }
+
+// =========================================================
+// MODAL EDITAR UBICACIÓN
+// =========================================================
+
+const editLocationModal = document.getElementById("editLocationModal");
+
+const closeEditLocationModal = document.getElementById(
+  "closeEditLocationModal",
+);
+
+const cancelEditLocation = document.getElementById("cancelEditLocation");
+
+const saveEditedLocation = document.getElementById("saveEditedLocation");
+
+const editLocationsList = document.getElementById("editLocationsList");
+
+const editLocationForm = document.getElementById("editLocationForm");
+
+// =========================================================
+// ABRIR MODAL
+// =========================================================
+
+async function abrirModalEditarUbicacion() {
+  editLocationModal.classList.remove("hidden");
+
+  document.body.style.overflow = "hidden";
+
+  // Ocultar formulario hasta seleccionar
+  editLocationForm.classList.add("hidden");
+
+  saveEditedLocation.disabled = true;
+
+  await cargarListaEditarUbicaciones();
+}
+
+// =========================================================
+// CERRAR MODAL
+// =========================================================
+
+function cerrarModalEditarUbicacion() {
+  editLocationModal.classList.add("hidden");
+
+  document.body.style.overflow = "";
+
+  limpiarEdicionUbicacion();
+}
+
+// =========================================================
+// EVENTOS
+// =========================================================
+
+closeEditLocationModal.addEventListener("click", cerrarModalEditarUbicacion);
+
+cancelEditLocation.addEventListener("click", cerrarModalEditarUbicacion);
+
+editLocationModal.addEventListener("click", (event) => {
+  if (event.target === editLocationModal) {
+    cerrarModalEditarUbicacion();
+  }
+});
+
+// ESC
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    !editLocationModal.classList.contains("hidden")
+  ) {
+    cerrarModalEditarUbicacion();
+  }
+});
+
+async function cargarListaEditarUbicaciones() {
+  editLocationsList.innerHTML = `
+        <div class="loading-locations">
+            Cargando ubicaciones...
+        </div>
+    `;
+
+  try {
+    const respuesta = await fetch(`${API_URL}/api/ubicaciones`);
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron obtener las ubicaciones.");
+    }
+
+    const resultado = await respuesta.json();
+
+    if (!resultado.ok) {
+      throw new Error(resultado.error || "Error obteniendo ubicaciones.");
+    }
+
+    // Actualizar array global
+
+    ubicaciones = resultado.ubicaciones;
+
+    mostrarListaEditar(ubicaciones);
+  } catch (error) {
+    console.error("Error cargando ubicaciones:", error);
+
+    editLocationsList.innerHTML = `
+            <div class="empty-locations">
+                ❌ ${escapeHtml(error.message)}
+            </div>
+        `;
+  }
+}
+
+function mostrarListaEditar(lista) {
+  editLocationsList.innerHTML = "";
+
+  if (!Array.isArray(lista) || lista.length === 0) {
+    editLocationsList.innerHTML = `
+            <div class="empty-locations">
+                No hay ubicaciones para editar.
+            </div>
+        `;
+
+    return;
+  }
+
+  lista.forEach((ubicacion) => {
+    const item = document.createElement("label");
+
+    item.className = "edit-location-item";
+
+    item.innerHTML = `
+
+                <input
+                    type="radio"
+                    name="editLocation"
+                    class="edit-location-radio"
+                    value="${escapeHtml(ubicacion.id)}"
+                >
+
+                <div class="edit-location-data">
+
+                    <span class="edit-location-id">
+                        ${escapeHtml(ubicacion.id)}
+                    </span>
+
+                    <span class="edit-location-name">
+                        ${escapeHtml(ubicacion.nombre)}
+                    </span>
+
+                    <span class="edit-location-coordinates">
+                        ${ubicacion.latitud},
+                        ${ubicacion.longitud}
+                    </span>
+
+                </div>
+            `;
+
+    const radio = item.querySelector(".edit-location-radio");
+
+    radio.addEventListener("change", () => {
+      // Quitar selección visual
+      editLocationsList
+        .querySelectorAll(".edit-location-item")
+        .forEach((elemento) => {
+          elemento.classList.remove("selected");
+        });
+
+      item.classList.add("selected");
+
+      seleccionarUbicacionParaEditar(ubicacion);
+      const altura = item.getBoundingClientRect().height;
+      item.style.marginTop = "4px";
+
+      console.log("Altura del seleccionado:", altura);
+      locationList.style.maxHeight = `${altura + 4}px`;
+    });
+
+    editLocationsList.appendChild(item);
+  });
+}
+
+function seleccionarUbicacionParaEditar(ubicacion) {
+  // ID
+  document.getElementById("editLocationId").textContent = ubicacion.id;
+
+  // Nombre
+  document.getElementById("editLocationName").value = ubicacion.nombre || "";
+
+  // Latitud
+  document.getElementById("editLocationLatitude").value = ubicacion.latitud;
+
+  // Longitud
+  document.getElementById("editLocationLongitude").value = ubicacion.longitud;
+
+  // Mostrar formulario
+
+  editLocationForm.classList.remove("hidden");
+
+  // Habilitar guardar
+
+  saveEditedLocation.disabled = false;
+}
+
+saveEditedLocation.addEventListener("click", guardarEdicionUbicacion);
+
+async function guardarEdicionUbicacion() {
+  const id = document.getElementById("editLocationId").textContent.trim();
+
+  const nombre = document.getElementById("editLocationName").value.trim();
+
+  const latitud = Number(document.getElementById("editLocationLatitude").value);
+
+  const longitud = Number(
+    document.getElementById("editLocationLongitude").value,
+  );
+
+  // =====================================================
+  // VALIDACIONES
+  // =====================================================
+
+  if (!id) {
+    mostrarMensaje("❌ No se seleccionó ninguna ubicación.", true);
+
+    return;
+  }
+
+  if (!nombre) {
+    mostrarMensaje("❌ El nombre no puede estar vacío.", true);
+
+    return;
+  }
+
+  if (!Number.isFinite(latitud) || latitud < -90 || latitud > 90) {
+    mostrarMensaje("❌ La latitud debe estar entre -90 y 90.", true);
+
+    return;
+  }
+
+  if (!Number.isFinite(longitud) || longitud < -180 || longitud > 180) {
+    mostrarMensaje("❌ La longitud debe estar entre -180 y 180.", true);
+
+    return;
+  }
+
+  const textoOriginal = saveEditedLocation.textContent;
+
+  try {
+    saveEditedLocation.disabled = true;
+
+    saveEditedLocation.textContent = "⏳ Guardando...";
+
+    const respuesta = await fetch(`${API_URL}/api/ubicaciones`, {
+      method: "PUT",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        id,
+        nombre,
+        latitud,
+        longitud,
+      }),
+    });
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || !resultado.ok) {
+      throw new Error(resultado.error || "No se pudo modificar la ubicación.");
+    }
+
+    // =================================================
+    // ACTUALIZAR ARRAY GLOBAL
+    // =================================================
+
+    ubicaciones = resultado.ubicaciones;
+
+    // =================================================
+    // ACTUALIZAR SELECT
+    // =================================================
+
+    actualizarSelectUbicaciones();
+
+    // Mantener seleccionada la ubicación editada
+
+    const select = document.getElementById("locationSelect");
+
+    if (select) {
+      select.value = resultado.ubicacion.id;
+
+      localStorage.setItem("meteo-ubicacion-id", resultado.ubicacion.id);
+    }
+
+    // =================================================
+    // CERRAR
+    // =================================================
+
+    cerrarModalEditarUbicacion();
+
+    // =================================================
+    // MENSAJE
+    // =================================================
+
+    mostrarMensaje(
+      `✅ "${resultado.ubicacion.nombre}" fue actualizada correctamente.`,
+    );
+  } catch (error) {
+    console.error("Error editando ubicación:", error);
+
+    mostrarMensaje(`❌ ${error.message}`, true);
+
+    saveEditedLocation.disabled = false;
+
+    saveEditedLocation.textContent = textoOriginal;
+  }
+}
+
+function limpiarEdicionUbicacion() {
+  editLocationsList
+    .querySelectorAll(".edit-location-radio")
+    .forEach((radio) => {
+      radio.checked = false;
+    });
+
+  editLocationsList.querySelectorAll(".edit-location-item").forEach((item) => {
+    item.classList.remove("selected");
+  });
+
+  editLocationForm.classList.add("hidden");
+
+  document.getElementById("editLocationId").textContent = "";
+
+  document.getElementById("editLocationName").value = "";
+
+  document.getElementById("editLocationLatitude").value = "";
+
+  document.getElementById("editLocationLongitude").value = "";
+
+  saveEditedLocation.disabled = true;
+
+  saveEditedLocation.textContent = "💾 Guardar cambios";
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   $("footerYear").textContent = new Date().getFullYear();
@@ -1384,4 +1716,25 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+// ================================================================================
+// Función para limpiar los campos de un formulario, restableciendo su estado inicial
+// ================================================================================
+function limpiarFormulario(contenedor, elementos) {
+  elementos.forEach((elemento) => {
+    document.getElementById(elemento).value = "";
+  });
+  console.log("Limpiando formulario:", contenedor);
+  if (!contenedor) return;
+
+  // const inputs = contenedor.querySelectorAll("input");
+
+  // inputs.forEach((input) => {
+  //   if (input.type === "checkbox" || input.type === "radio") {
+  //     input.checked = false;
+  //   } else {
+  //     input.value = "";
+  //   }
+  // });
 }

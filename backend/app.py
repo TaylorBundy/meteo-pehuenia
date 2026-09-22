@@ -511,6 +511,232 @@ def eliminar_ubicaciones():
             "error": str(error)
         }), 500
 
+@app.put("/api/ubicaciones")
+def editar_ubicacion():
+
+    if not GITHUB_TOKEN:
+        return jsonify({
+            "ok": False,
+            "error": "No está configurado GITHUB_TOKEN en Render"
+        }), 500
+
+
+    try:
+
+        datos = request.get_json(silent=True)
+
+
+        if not datos:
+
+            return jsonify({
+                "ok": False,
+                "error": "No se recibieron datos"
+            }), 400
+
+
+        # ==================================================
+        # DATOS
+        # ==================================================
+
+        id_ubicacion = str(
+            datos.get("id", "")
+        ).strip()
+
+
+        nombre = str(
+            datos.get("nombre", "")
+        ).strip()
+
+
+        if not id_ubicacion:
+
+            return jsonify({
+                "ok": False,
+                "error": "No se recibió el ID"
+            }), 400
+
+
+        if not nombre:
+
+            return jsonify({
+                "ok": False,
+                "error": "El nombre es obligatorio"
+            }), 400
+
+
+        # ==================================================
+        # COORDENADAS
+        # ==================================================
+
+        try:
+
+            latitud = float(
+                datos.get("latitud")
+            )
+
+            longitud = float(
+                datos.get("longitud")
+            )
+
+        except (TypeError, ValueError):
+
+            return jsonify({
+                "ok": False,
+                "error": "Las coordenadas no son válidas"
+            }), 400
+
+
+        if not -90 <= latitud <= 90:
+
+            return jsonify({
+                "ok": False,
+                "error": "La latitud debe estar entre -90 y 90"
+            }), 400
+
+
+        if not -180 <= longitud <= 180:
+
+            return jsonify({
+                "ok": False,
+                "error": "La longitud debe estar entre -180 y 180"
+            }), 400
+
+
+        # ==================================================
+        # OBTENER JSON ACTUAL
+        # ==================================================
+
+        ubicaciones, sha = \
+            obtener_archivo_github()
+
+
+        # ==================================================
+        # BUSCAR POR ID
+        # ==================================================
+
+        ubicacion_encontrada = None
+
+
+        for ubicacion in ubicaciones:
+
+            if str(
+                ubicacion.get("id", "")
+            ) == id_ubicacion:
+
+                ubicacion_encontrada = ubicacion
+
+                break
+
+
+        if not ubicacion_encontrada:
+
+            return jsonify({
+                "ok": False,
+                "error": (
+                    "No existe una ubicación "
+                    f"con el ID '{id_ubicacion}'"
+                )
+            }), 404
+
+
+        # ==================================================
+        # COMPROBAR NOMBRE DUPLICADO
+        # ==================================================
+
+        nombre_normalizado = \
+            nombre.casefold()
+
+
+        for ubicacion in ubicaciones:
+
+            if (
+                str(
+                    ubicacion.get("id", "")
+                ) != id_ubicacion
+                and
+                str(
+                    ubicacion.get("nombre", "")
+                ).casefold()
+                ==
+                nombre_normalizado
+            ):
+
+                return jsonify({
+                    "ok": False,
+                    "error": (
+                        "Ya existe otra ubicación "
+                        "con ese nombre"
+                    )
+                }), 409
+
+
+        # ==================================================
+        # MODIFICAR SOLAMENTE LO PERMITIDO
+        # ==================================================
+
+        ubicacion_encontrada["nombre"] = \
+            nombre
+
+        ubicacion_encontrada["latitud"] = \
+            latitud
+
+        ubicacion_encontrada["longitud"] = \
+            longitud
+
+
+        # ==================================================
+        # GUARDAR
+        # ==================================================
+
+        resultado = \
+            guardar_archivo_github(
+                ubicaciones,
+                sha,
+                f"Editar ubicación: {nombre}"
+            )
+
+
+        # ==================================================
+        # RESPUESTA
+        # ==================================================
+
+        return jsonify({
+
+            "ok": True,
+
+            "mensaje":
+                "Ubicación actualizada correctamente",
+
+            "ubicacion":
+                ubicacion_encontrada,
+
+            "ubicaciones":
+                ubicaciones,
+
+            "commit":
+                resultado
+                .get("commit", {})
+                .get("sha")
+        })
+
+
+    except Exception as error:
+
+        print(
+            "ERROR editando ubicación:",
+            error
+        )
+
+
+        return jsonify({
+
+            "ok": False,
+
+            "error":
+                str(error)
+
+        }), 500
+
 
 # ============================================================
 # ARRANQUE

@@ -1115,3 +1115,441 @@
     justify-content: center;
   }
 }
+
+/* =========================================================
+   MODAL EDITAR UBICACIÓN
+   ========================================================= */
+
+.location-modal3 {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 10000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.68);
+
+  backdrop-filter: blur(7px);
+}
+
+#editLocationModal.hidden {
+  display: none;
+}
+
+.edit-location-dialog {
+  width: min(540px, 100%);
+
+  max-height: min(720px, 90vh);
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(24, 35, 48, 0.98),
+    rgba(12, 20, 30, 0.98)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.edit-location-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-location-header-info {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.edit-location-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(60, 140, 230, 0.15);
+
+  font-size: 20px;
+}
+
+.edit-location-header h2 {
+  margin: 0;
+
+  color: #fff;
+
+  font-size: 18px;
+}
+
+.edit-location-header p {
+  margin: 3px 0 0;
+
+  color: rgba(255, 255, 255, 0.58);
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.edit-location-content {
+  padding: 18px 20px;
+
+  overflow-y: auto;
+  max-height: max-content;
+}
+
+.edit-location-info {
+  margin-bottom: 12px;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   LISTA DE UBICACIONES
+   ========================================================= */
+
+.edit-locations-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  max-height: 300px;
+
+  overflow-y: auto;
+
+  padding-right: 3px;
+}
+
+.edit-location-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  width: 100%;
+
+  padding: 12px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.edit-location-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(100, 180, 255, 0.3);
+}
+
+.edit-location-item.selected {
+  background: rgba(50, 130, 220, 0.13);
+
+  border-color: rgba(80, 160, 255, 0.5);
+
+  transform: translateY(-1px);
+}
+
+/* RADIO */
+
+.edit-location-radio {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+
+  accent-color: #4c9bea;
+
+  cursor: pointer;
+}
+
+/* DATOS */
+
+.edit-location-data {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.edit-location-id {
+  color: #73b6ff;
+
+  font-family: monospace;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+.edit-location-name {
+  color: #fff;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.edit-location-coordinates {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-family: monospace;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   FORMULARIO
+   ========================================================= */
+
+.edit-location-form {
+  margin-top: 18px;
+
+  padding-top: 17px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-location-form.hidden {
+  display: none;
+}
+
+.edit-selected-location {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 15px;
+
+  padding: 9px 12px;
+
+  border-radius: 9px;
+
+  background: rgba(70, 150, 230, 0.08);
+
+  border: 1px solid rgba(70, 150, 230, 0.2);
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 12px;
+}
+
+.edit-selected-location strong {
+  color: #73b6ff;
+
+  font-family: monospace;
+}
+
+/* =========================================================
+   CAMPOS
+   ========================================================= */
+
+.edit-location-form .form-group {
+  margin-bottom: 13px;
+}
+
+.edit-location-form label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+.edit-location-form input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 9px;
+
+  background: rgba(0, 0, 0, 0.2);
+
+  color: #fff;
+
+  outline: none;
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.edit-location-form input:focus {
+  border-color: rgba(80, 160, 255, 0.55);
+
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.edit-coordinates-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+}
+
+.edit-location-note {
+  margin-top: 5px;
+
+  padding: 10px 12px;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 11px;
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.edit-location-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 15px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-confirm-btn {
+  min-height: 40px;
+
+  padding: 9px 16px;
+
+  border-radius: 9px;
+
+  border: 1px solid rgba(70, 160, 255, 0.35);
+
+  background: rgba(40, 120, 210, 0.45);
+
+  color: #fff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.edit-confirm-btn:hover:not(:disabled) {
+  background: rgba(45, 140, 230, 0.65);
+}
+
+.edit-confirm-btn:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+  #editLocationModal {
+    align-items: flex-start;
+
+    padding: 0;
+  }
+
+  .edit-location-dialog {
+    width: 100%;
+
+    max-height: 90vh;
+
+    border-radius: 18px;
+  }
+
+  .edit-locations-list {
+    max-height: 35vh;
+  }
+
+  .edit-coordinates-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-location-footer {
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    justify-content: center;
+  }
+}

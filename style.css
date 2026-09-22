@@ -61,6 +61,7 @@ body::before {
 }
 
 .add-location-btn,
+.edit-location-btn,
 .delete-location-btn {
   width: 100%;
   margin-top: 9px;
@@ -187,6 +188,7 @@ main {
 
 #hero2 {
   margin-top: 5px;
+  z-index: 199;
 }
 
 .eyebrow {
@@ -772,8 +774,45 @@ footer {
 
 .buttonContainer {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
+}
+
+.edit-location-btn {
+  /* display: inline-flex; */
+
+  /* align-items: center; */
+  /* justify-content: center; */
+
+  /* gap: 8px; */
+
+  /* padding: 11px 17px; */
+
+  /* border: 1px solid rgba(80, 160, 255, 0.35); */
+
+  /* border-radius: 10px; */
+
+  background: rgba(35, 100, 170, 0.3);
+
+  color: #fff;
+
+  /* font-size: 14px; */
+  /* font-weight: 600; */
+
+  /* cursor: pointer; */
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.edit-location-btn:hover {
+  background: rgba(45, 125, 210, 0.48);
+
+  border-color: rgba(100, 180, 255, 0.6);
+
+  transform: translateY(-1px);
 }
 
 /* =========================
