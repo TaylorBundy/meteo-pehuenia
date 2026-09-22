@@ -564,7 +564,8 @@
 
     padding: 22px 18px 18px;
 
-    border-radius: 23px 23px 0 0;
+    /* border-radius: 23px 23px 0 0; */
+    border-radius: 18px;
 
     border-bottom: 0;
 
@@ -708,7 +709,7 @@
    MODAL ELIMINAR
    ========================================================= */
 
-#deleteLocationModal {
+.location-modal2 {
   position: fixed;
 
   inset: 0;
@@ -738,7 +739,8 @@
 .delete-location-dialog {
   width: min(520px, 100%);
 
-  max-height: min(700px, 90vh);
+  /* max-height: min(700px, 90vh); */
+  max-height: calc(80vh - 40px);
 
   display: flex;
   flex-direction: column;
@@ -848,6 +850,7 @@
   padding: 18px 20px;
 
   overflow-y: auto;
+  /* overflow: hidden; */
 }
 
 .delete-location-info {
@@ -871,9 +874,9 @@
 
   gap: 7px;
 
-  max-height: 350px;
+  /* max-height: 360px; */
 
-  overflow-y: auto;
+  /* overflow-y: auto; */
 
   padding-right: 3px;
 }
@@ -1089,7 +1092,7 @@
   }
 
   #deleteLocationModal {
-    align-items: flex-end;
+    /* align-items: flex-end; */
 
     padding: 0;
   }
@@ -1097,9 +1100,10 @@
   .delete-location-dialog {
     width: 100%;
 
-    max-height: 90vh;
+    /* max-height: 90vh; */
 
-    border-radius: 18px 18px 0 0;
+    /* border-radius: 18px 18px 0 0; */
+    border-radius: 18px;
   }
 
   .delete-location-list {
@@ -1108,5 +1112,6 @@
 
   .delete-location-footer {
     padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    justify-content: center;
   }
 }

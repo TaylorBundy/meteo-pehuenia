@@ -478,7 +478,7 @@ async function cargarUbicaciones() {
       }
 
       const resultado = await respuesta.json();
-      console.log(resultado);
+      // console.log(resultado);
 
       if (!resultado.ok) {
         throw new Error(resultado.error);
@@ -606,7 +606,7 @@ async function guardarUbicacion(event) {
     });
 
     const resultado = await respuesta.json();
-    console.log(resultado);
+    // console.log(resultado);
 
     if (!respuesta.ok || !resultado.ok) {
       throw new Error(resultado.error || "No se pudo guardar la ubicación.");
@@ -840,7 +840,7 @@ async function loadWeather() {
     if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
     weatherData = await response.json();
-    console.log(weatherData);
+    // console.log(weatherData);
     renderAll();
     hideStatus();
   } catch (error) {
