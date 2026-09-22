@@ -732,6 +732,43 @@ footer {
   border: 0;
 }
 
+.toast-mensaje {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+
+  z-index: 99999;
+
+  padding: 14px 20px;
+
+  border-radius: 12px;
+
+  background: rgba(20, 30, 40, 0.95);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  color: white;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+  transform: translateY(30px);
+
+  opacity: 0;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.toast-mensaje.mostrar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-mensaje.error {
+  border-color: rgba(255, 80, 80, 0.5);
+}
+
 /* =========================
    TABLET
 ========================= */

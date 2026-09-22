@@ -51,7 +51,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-async function cargarUbicaciones() {
+async function cargarUbicaciones2() {
   const select = document.getElementById("locationSelect");
 
   if (!select) {
@@ -110,6 +110,250 @@ async function cargarUbicaciones() {
 
     select.appendChild(option);
   }
+}
+
+async function cargarUbicaciones() {
+  const select = document.getElementById("locationSelect");
+
+  if (!select) return;
+
+  try {
+    select.innerHTML = "<option value=''>Cargando ubicaciones...</option>";
+
+    let datos;
+
+    // ==================================================
+    // PRIMERO: RENDER
+    // ==================================================
+
+    try {
+      const respuesta = await fetch(`${API_URL}/api/ubicaciones`);
+
+      if (!respuesta.ok) {
+        throw new Error("Backend no disponible");
+      }
+
+      const resultado = await respuesta.json();
+
+      if (!resultado.ok) {
+        throw new Error(resultado.error);
+      }
+
+      datos = resultado.ubicaciones;
+    } catch (error) {
+      console.warn("Render no disponible, usando JSON local:", error);
+
+      // ==============================================
+      // RESPALDO: GITHUB PAGES
+      // ==============================================
+
+      const respuesta = await fetch("data/ubicaciones.json");
+
+      if (!respuesta.ok) {
+        throw new Error("No se pudo cargar ubicaciones.json");
+      }
+
+      datos = await respuesta.json();
+    }
+
+    ubicaciones = datos;
+
+    // ==================================================
+    // LLENAR SELECT
+    // ==================================================
+
+    select.innerHTML = "";
+
+    const opcionInicial = document.createElement("option");
+
+    opcionInicial.value = "";
+    opcionInicial.textContent = "Seleccionar ubicación...";
+
+    select.appendChild(opcionInicial);
+
+    ubicaciones.forEach((ubicacion) => {
+      const option = document.createElement("option");
+
+      option.value = ubicacion.id;
+
+      option.textContent = ubicacion.nombre;
+
+      select.appendChild(option);
+    });
+
+    // ==================================================
+    // RECUPERAR ÚLTIMA UBICACIÓN
+    // ==================================================
+
+    const guardada = localStorage.getItem("meteo-ubicacion-id");
+
+    if (guardada) {
+      const existe = ubicaciones.some((ubicacion) => ubicacion.id === guardada);
+
+      if (existe) {
+        select.value = guardada;
+
+        seleccionarUbicacion(guardada);
+      }
+    }
+  } catch (error) {
+    console.error("Error cargando ubicaciones:", error);
+
+    select.innerHTML = "<option value=''>Error al cargar ubicaciones</option>";
+  }
+}
+
+const locationForm = document.getElementById("locationForm");
+
+locationForm.addEventListener("submit", guardarUbicacion);
+
+async function guardarUbicacion(event) {
+  event.preventDefault();
+
+  const boton = locationForm.querySelector('button[type="submit"]');
+
+  const textoOriginal = boton.textContent;
+
+  try {
+    boton.disabled = true;
+    boton.textContent = "⏳ Guardando...";
+
+    const nombre = document.getElementById("locationName").value.trim();
+
+    const provincia = document.getElementById("locationProvince").value.trim();
+
+    const pais = document.getElementById("locationCountry").value.trim();
+
+    const latitud = Number(document.getElementById("locationLatitude").value);
+
+    const longitud = Number(document.getElementById("locationLongitude").value);
+
+    // --------------------------------------------------
+    // VALIDACIONES
+    // --------------------------------------------------
+
+    if (!nombre) {
+      throw new Error("Ingresá el nombre de la ubicación.");
+    }
+
+    if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) {
+      throw new Error("Las coordenadas no son válidas.");
+    }
+
+    // --------------------------------------------------
+    // ENVIAR A RENDER
+    // --------------------------------------------------
+
+    const respuesta = await fetch(`${API_URL}/api/ubicaciones`, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        nombre,
+        provincia,
+        pais,
+        latitud,
+        longitud,
+      }),
+    });
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || !resultado.ok) {
+      throw new Error(resultado.error || "No se pudo guardar la ubicación.");
+    }
+
+    // --------------------------------------------------
+    // ACTUALIZAR ARRAY LOCAL
+    // --------------------------------------------------
+
+    ubicaciones = resultado.ubicaciones;
+
+    // --------------------------------------------------
+    // ACTUALIZAR SELECT
+    // --------------------------------------------------
+
+    const select = document.getElementById("locationSelect");
+
+    if (select) {
+      select.innerHTML = "";
+
+      const opcionInicial = document.createElement("option");
+
+      opcionInicial.value = "";
+      opcionInicial.textContent = "Seleccionar ubicación...";
+
+      select.appendChild(opcionInicial);
+
+      ubicaciones.forEach((ubicacion) => {
+        const option = document.createElement("option");
+
+        option.value = ubicacion.id;
+
+        option.textContent = ubicacion.nombre;
+
+        select.appendChild(option);
+      });
+
+      // Seleccionar la recién creada
+
+      select.value = resultado.ubicacion.id;
+    }
+
+    // --------------------------------------------------
+    // GUARDAR SELECCIÓN
+    // --------------------------------------------------
+
+    localStorage.setItem("meteo-ubicacion-id", resultado.ubicacion.id);
+
+    // --------------------------------------------------
+    // CERRAR MODAL
+    // --------------------------------------------------
+
+    cerrarModalUbicacion();
+
+    // --------------------------------------------------
+    // MOSTRAR MENSAJE
+    // --------------------------------------------------
+
+    mostrarMensaje(`✅ ${resultado.ubicacion.nombre} agregada correctamente.`);
+  } catch (error) {
+    console.error("Error guardando ubicación:", error);
+
+    mostrarMensaje(`❌ ${error.message}`, true);
+  } finally {
+    boton.disabled = false;
+    boton.textContent = textoOriginal;
+  }
+}
+
+function mostrarMensaje(texto, error = false) {
+  const mensaje = document.createElement("div");
+
+  mensaje.className = "toast-mensaje";
+
+  if (error) {
+    mensaje.classList.add("error");
+  }
+
+  mensaje.textContent = texto;
+
+  document.body.appendChild(mensaje);
+
+  setTimeout(() => {
+    mensaje.classList.add("mostrar");
+  }, 10);
+
+  setTimeout(() => {
+    mensaje.classList.remove("mostrar");
+
+    setTimeout(() => {
+      mensaje.remove();
+    }, 300);
+  }, 3500);
 }
 
 function seleccionarUbicacion(id) {
