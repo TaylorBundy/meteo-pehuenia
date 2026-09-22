@@ -5,6 +5,7 @@ const DEFAULT_LOCATION = {
   latitude: -38.884,
   longitude: -71.171,
 };
+const API_URL = "https://meteo-pehuenia.onrender.com";
 
 let selectedLocation = { ...DEFAULT_LOCATION };
 let weatherData = null;
