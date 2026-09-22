@@ -120,6 +120,14 @@
     "longitud": -70.662536
   },
   {
+    "id": "rapido-y-sabroson",
+    "nombre": "rapido y sabroson",
+    "provincia": "Neuquén",
+    "pais": "Argentina",
+    "latitud": -38.880339,
+    "longitud": -71.1872
+  },
+  {
     "id": "villa-pehuenia",
     "nombre": "Villa Pehuenia",
     "provincia": "Neuquén",
