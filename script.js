@@ -25,12 +25,30 @@ const deleteLocationWarning = document.getElementById("deleteLocationWarning");
 const locationForm = document.getElementById("locationForm");
 const locationSelect = document.getElementById("locationSelect");
 const locationList = document.getElementById("editLocationsList");
+const uvicono = document.getElementById("uvIcon");
 const plataforma = navigator.userAgent;
+
+const sun = {
+  sunrise: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sunrise.svg",
+  sunset: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sunset.svg",
+  uv1: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-1.svg",
+  uv2: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-2.svg",
+  uv3: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-3.svg",
+  uv4: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-4.svg",
+  uv5: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-5.svg",
+  uv6: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-6.svg",
+  uv7: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-7.svg",
+  uv8: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-8.svg",
+  uv9: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-9.svg",
+  uv10: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-10.svg",
+  uv11: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-11.svg",
+};
 
 let selectedLocation = { ...DEFAULT_LOCATION };
 let weatherData = null;
 let chart = null;
 let ubicaciones = [];
+let momento;
 
 function abrirModalUbicacion() {
   locationModal.classList.remove("hidden");
@@ -1180,6 +1198,8 @@ async function loadWeather() {
 
     weatherData = await response.json();
     // console.log(weatherData);
+    momento = determinarDiaNoche(weatherData);
+    // console.log(momento);
     renderAll();
     hideStatus();
   } catch (error) {
@@ -1209,8 +1229,15 @@ function renderCurrent() {
 
   $("currentTemp").textContent = round(c.temperature_2m);
   $("currentFeels").textContent = `${round(c.apparent_temperature)} °C`;
-  $("currentDescription").textContent = weatherCodeInfo(c.weather_code).label;
-  $("currentWeatherIcon").textContent = weatherCodeInfo(c.weather_code).icon;
+  $("currentDescription").textContent = weatherCodeInfo(
+    c.weather_code,
+    momento,
+  ).label;
+  //$("currentWeatherIcon").textContent = weatherCodeInfo(c.weather_code).icon;
+  $("currentWeatherIcon").innerHTML =
+    `<img src="${weatherCodeInfo(c.weather_code, momento).icon}">`;
+  //console.log(weatherCodeInfo(c.weather_code, momento).icon);
+  // $("imgIcon").src = "images/cloudy.mp4";
 
   $("windSpeed").textContent = round(c.wind_speed_10m);
   $("windGust").textContent = round(c.wind_gusts_10m);
@@ -1318,12 +1345,12 @@ function renderHourlyCards() {
   container.innerHTML = "";
 
   for (let i = nowIdx; i < Math.min(nowIdx + 16, h.time.length); i++) {
-    const info = weatherCodeInfo(h.weather_code[i]);
+    const info = weatherCodeInfo(h.weather_code[i], momento);
     const card = document.createElement("article");
     card.className = "hour-card";
     card.innerHTML = `
       <div class="time">${i === nowIdx ? "Ahora" : formatTime(h.time[i])}</div>
-      <div class="icon">${info.icon}</div>
+      <div class="icon" title="${info.label}"><img src="${info.icon}"></div>
       <div class="temp">${round(h.temperature_2m[i])}°</div>
       <div class="mini">
         💨 ${round(h.wind_speed_10m[i])} km/h<br>
@@ -1342,14 +1369,14 @@ function renderDaily() {
 
   d.time.forEach((time, i) => {
     const date = new Date(`${time}T12:00:00`);
-    const info = weatherCodeInfo(d.weather_code[i]);
+    const info = weatherCodeInfo(d.weather_code[i], momento);
 
     const card = document.createElement("article");
     card.className = "day-card";
     card.innerHTML = `
       <div class="day">${i === 0 ? "Hoy" : capitalize(date.toLocaleDateString("es-AR", { weekday: "short" }))}</div>
       <div class="date">${date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" })}</div>
-      <div class="icon" title="${info.label}">${info.icon}</div>
+      <div class="icon" title="${info.label}"><img src="${info.icon}"></div>
       <div class="range">${round(d.temperature_2m_max[i])}° <span>/ ${round(d.temperature_2m_min[i])}°</span></div>
       <div class="rain">
         🌧️ ${round(d.precipitation_probability_max[i])}% · ${format1(d.precipitation_sum[i])} mm<br>
@@ -1363,8 +1390,51 @@ function renderDaily() {
 function renderSun() {
   const d = weatherData.daily;
   $("sunrise").textContent = formatTime(d.sunrise[0]);
+  // document.getElementById("amanecer").innerHTML =
+  //   `<img src="${sun.sunrise}" alt=""/>`;
   $("sunset").textContent = formatTime(d.sunset[0]);
   $("uvIndex").textContent = format1(d.uv_index_max[0]);
+  // let indice;
+  // if (format1(d.uv_index_max[0]) < 2) {
+  //   indice = `${sun.uv1}`;
+  // } else if (format1(d.uv_index_max[0]) < 3) {
+  //   indice = `${sun.uv2}`;
+  // } else if (format1(d.uv_index_max[0]) < 4) {
+  //   indice = `${sun.uv3}`;
+  // }
+  const indice = obtenerIconoUV(d.uv_index_max[0]);
+
+  document.getElementById("uvIcon").innerHTML =
+    `<img src="${indice}" alt="Índice UV"/>`;
+  uvicono.title = `Índice UV: ${format1(d.uv_index_max[0])}`;
+  //document.getElementById("uvIcon").innerHTML = `<img src="${indice}" alt=""/>`;
+  //console.log(format1(d.uv_index_max[0]));
+}
+
+function obtenerIconoUV(uv) {
+  uv = Number(uv);
+
+  if (!Number.isFinite(uv)) {
+    return null;
+  }
+
+  if (uv < 3) {
+    return sun.uv1;
+  }
+
+  if (uv < 6) {
+    return sun.uv3;
+  }
+
+  if (uv < 8) {
+    return sun.uv6;
+  }
+
+  if (uv < 11) {
+    return sun.uv8;
+  }
+
+  return sun.uv11;
 }
 
 function renderChart() {
@@ -1622,10 +1692,14 @@ function nearestHourlyIndex(currentTime, hourlyTimes) {
   return best;
 }
 
-function weatherCodeInfo(code) {
+function weatherCodeInfo2(code) {
   const table = {
     0: ["Despejado", "☀️"],
-    1: ["Mayormente despejado", "🌤️"],
+    //1: ["Mayormente despejado", "🌤️"],
+    1: [
+      "Mayormente despejado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day.svg",
+    ],
     2: ["Parcialmente nublado", "⛅"],
     3: ["Cubierto", "☁️"],
     45: ["Niebla", "🌫️"],
@@ -1655,6 +1729,238 @@ function weatherCodeInfo(code) {
   };
   const item = table[code] || ["Condiciones variables", "🌤️"];
   return { label: item[0], icon: item[1] };
+}
+
+function weatherCodeInfo3(code) {
+  let table = {};
+
+  table = {
+    0: [
+      "Despejado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/clear-day.svg",
+    ],
+    //1: ["Mayormente despejado", "🌤️"],
+    1: [
+      "Mayormente despejado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day.svg",
+    ],
+    2: [
+      "Parcialmente nublado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/partly-cloudy-day.svg",
+    ],
+    3: ["Cubierto", "☁️"],
+    45: ["Niebla", "🌫️"],
+    48: ["Niebla con escarcha", "🌫️"],
+    51: ["Llovizna leve", "🌦️"],
+    53: ["Llovizna", "🌦️"],
+    55: ["Llovizna intensa", "🌧️"],
+    56: ["Llovizna helada leve", "🌧️"],
+    57: ["Llovizna helada intensa", "🌧️"],
+    61: ["Lluvia leve", "🌦️"],
+    63: ["Lluvia", "🌧️"],
+    65: ["Lluvia intensa", "🌧️"],
+    66: ["Lluvia helada leve", "🌧️"],
+    67: ["Lluvia helada intensa", "🌧️"],
+    71: ["Nevada leve", "🌨️"],
+    73: ["Nevada", "🌨️"],
+    75: ["Nevada intensa", "❄️"],
+    77: ["Granos de nieve", "❄️"],
+    80: ["Chaparrones leves", "🌦️"],
+    81: ["Chaparrones", "🌧️"],
+    82: ["Chaparrones intensos", "⛈️"],
+    85: ["Chaparrones de nieve leves", "🌨️"],
+    86: ["Chaparrones de nieve intensos", "❄️"],
+    95: ["Tormenta", "⛈️"],
+    96: ["Tormenta con granizo", "⛈️"],
+    99: ["Tormenta fuerte con granizo", "⛈️"],
+  };
+  const item = table[code] || ["Condiciones variables", "🌤️"];
+  return { label: item[0], icon: item[1] };
+}
+
+function weatherCodeInfo(code, momento = "dia") {
+  const table = {
+    0: [
+      "Despejado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/clear-day.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/clear-night.svg",
+    ],
+
+    1: [
+      "Mayormente despejado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-night.svg",
+    ],
+
+    2: [
+      "Parcialmente nublado",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/partly-cloudy-day.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/partly-cloudy-night.svg",
+    ],
+
+    3: [
+      "Cubierto",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/overcast-day.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/overcast-night.svg",
+    ],
+
+    45: [
+      "Niebla",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/fog-day.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/fog-night.svg",
+    ],
+
+    48: [
+      "Niebla con escarcha",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/fog-day.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/fog-night.svg",
+    ],
+
+    51: [
+      "Llovizna leve",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day-drizzle.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-night-drizzle.svg",
+    ],
+
+    53: [
+      "Llovizna",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/overcast-day-drizzle.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/overcast-drizzle.svg",
+    ],
+
+    55: [
+      "Llovizna intensa",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-drizzle.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-night-drizzle.svg",
+    ],
+
+    56: [
+      "Llovizna helada leve",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sleet.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sleet.svg",
+    ],
+
+    57: [
+      "Llovizna helada intensa",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-sleet.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-sleet.svg",
+    ],
+
+    61: [
+      "Lluvia leve",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day-rain.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-night-rain.svg",
+    ],
+
+    63: [
+      "Lluvia",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day-rain.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-night-rain.svg",
+    ],
+
+    65: [
+      "Lluvia intensa",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-rain.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-rain.svg",
+    ],
+
+    66: [
+      "Lluvia helada leve",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/overcast-day-sleet.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/overcast-night-sleet.svg",
+    ],
+
+    67: [
+      "Lluvia helada intensa",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-sleet.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-night-sleet.svg",
+    ],
+
+    71: [
+      "Nevada leve",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/snow.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/snow.svg",
+    ],
+
+    73: [
+      "Nevada",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day-snow.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-night-snow.svg",
+    ],
+
+    75: [
+      "Nevada intensa",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-snow.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-snow.svg",
+    ],
+
+    77: [
+      "Granos de nieve",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-day-hail.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/mostly-clear-night-hail.svg",
+    ],
+
+    80: [
+      "Chaparrones leves",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/drizzle.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/drizzle.svg",
+    ],
+
+    81: [
+      "Chaparrones",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/rain.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/rain.svg",
+    ],
+
+    82: [
+      "Chaparrones intensos",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-drizzle.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-night-drizzle.svg",
+    ],
+
+    85: [
+      "Chaparrones de nieve leves",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-sleet.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-night-sleet.svg",
+    ],
+
+    86: [
+      "Chaparrones de nieve intensos",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-day-snow.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/extreme-snow.svg",
+    ],
+
+    95: [
+      "Tormenta",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thunderstorms.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thunderstorms-night.svg",
+    ],
+
+    96: [
+      "Tormenta con granizo",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thunderstorms-day-hail.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thunderstorms-night-hail.svg",
+    ],
+
+    99: [
+      "Tormenta fuerte con granizo",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thunderstorms-extreme-day-hail.svg",
+      "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thunderstorms-extreme-night-hail.svg",
+    ],
+  };
+
+  const item = table[code] || ["Condiciones variables", "🌤️", "🌙"];
+
+  // =====================================================
+  // SELECCIONAR ICONO
+  // =====================================================
+
+  const icon = momento === "noche" ? item[2] : item[1];
+
+  return {
+    label: item[0],
+    icon: icon,
+  };
 }
 
 function degreesToCompass(deg) {
@@ -1744,4 +2050,18 @@ function limpiarFormulario(contenedor, elementos) {
   //     input.value = "";
   //   }
   // });
+}
+
+function determinarDiaNoche(data) {
+  const ahora = new Date();
+
+  const sunrise = new Date(data.daily.sunrise[0]);
+
+  const sunset = new Date(data.daily.sunset[0]);
+
+  if (ahora >= sunrise && ahora < sunset) {
+    return "dia";
+  }
+
+  return "noche";
 }

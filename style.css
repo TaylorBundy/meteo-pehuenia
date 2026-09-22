@@ -573,7 +573,7 @@ section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
 }
 
 .hour-card .icon {
-  margin: 10px 0;
+  /* margin: 10px 0; */
   font-size: 30px;
 }
 
@@ -604,6 +604,10 @@ section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
   text-align: center;
 }
 
+.day-card img {
+  width: 100px;
+}
+
 .day-card .day {
   font-size: 13px;
   font-weight: 700;
@@ -617,7 +621,7 @@ section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
 
 .day-card .icon {
   font-size: 32px;
-  margin: 12px 0;
+  /* margin: 12px 0; */
 }
 
 .day-card .range {
@@ -644,6 +648,10 @@ section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
   margin-top: 18px;
 }
 
+.sun-grid > article {
+  background: linear-gradient(145deg, rgb(1 14 26 / 90%), rgb(12 61 110 / 81%));
+}
+
 .sun-card {
   display: flex;
   align-items: center;
@@ -653,6 +661,8 @@ section.panel:not(.hero):not(.current-main):not(.metric):not(.sun-card) {
 
 .sun-card > span {
   font-size: 30px;
+  width: 45px;
+  height: 45px;
 }
 
 .sun-card small,
@@ -813,6 +823,11 @@ footer {
   border-color: rgba(100, 180, 255, 0.6);
 
   transform: translateY(-1px);
+}
+
+.sun-grid img {
+  height: 45px;
+  border-radius: 25px;
 }
 
 /* =========================

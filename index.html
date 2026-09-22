@@ -107,7 +107,10 @@
         <section class="current-grid">
           <article class="current-main panel">
             <div class="weather-main">
-              <div id="currentWeatherIcon" class="weather-icon">☀️</div>
+              <div id="currentWeatherIcon" class="weather-icon">
+                <!-- <img id="imgIcon" src="" alt="Ícono del clima" /> -->
+                ☀️
+              </div>
               <div>
                 <p class="label">AHORA</p>
                 <div class="temperature-line">
@@ -247,19 +250,27 @@
 
         <section class="sun-grid">
           <article class="panel sun-card">
-            <span>🌅</span>
+            <span id="amanecer"
+              ><img
+                src="https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sunrise.svg"
+                alt=""
+            /></span>
             <div>
               <small>Amanecer</small><strong id="sunrise">--:--</strong>
             </div>
           </article>
           <article class="panel sun-card">
-            <span>🌇</span>
+            <span id="atardecer"
+              ><img
+                src="https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sunset.svg"
+                alt=""
+            /></span>
             <div>
               <small>Atardecer</small><strong id="sunset">--:--</strong>
             </div>
           </article>
           <article class="panel sun-card">
-            <span>☀️</span>
+            <span id="uvIcon">☀️</span>
             <div>
               <small>Índice UV máx.</small><strong id="uvIndex">--</strong>
             </div>
