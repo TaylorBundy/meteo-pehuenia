@@ -261,6 +261,7 @@ async function guardarUbicacion(event) {
     });
 
     const resultado = await respuesta.json();
+    console.log(resultado);
 
     if (!respuesta.ok || !resultado.ok) {
       throw new Error(resultado.error || "No se pudo guardar la ubicación.");
