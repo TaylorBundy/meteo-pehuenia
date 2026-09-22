@@ -25,6 +25,7 @@ const deleteLocationWarning = document.getElementById("deleteLocationWarning");
 const locationForm = document.getElementById("locationForm");
 const locationSelect = document.getElementById("locationSelect");
 const locationList = document.getElementById("editLocationsList");
+const plataforma = navigator.userAgent;
 
 let selectedLocation = { ...DEFAULT_LOCATION };
 let weatherData = null;
@@ -1056,6 +1057,12 @@ function limpiarEdicionUbicacion() {
   editLocationsList.querySelectorAll(".edit-location-item").forEach((item) => {
     item.classList.remove("selected");
   });
+
+  if (plataforma.includes("Android")) {
+    locationList.style.maxHeight = "35vh";
+  } else {
+    locationList.style.maxHeight = "300px";
+  }
 
   editLocationForm.classList.add("hidden");
 
