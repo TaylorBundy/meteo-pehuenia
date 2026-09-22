@@ -552,7 +552,7 @@
 
 @media (max-width: 600px) {
   .modal-overlay {
-    align-items: flex-end;
+    align-items: center;
 
     padding: 0;
   }
@@ -597,7 +597,8 @@
   }
 
   .form-row {
-    grid-template-columns: 1fr;
+    /* grid-template-columns: 1fr; */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0;
   }
 
@@ -657,5 +658,455 @@
 
   .save-btn {
     order: 1;
+  }
+}
+
+/* =========================================================
+   BOTONES DE UBICACIONES
+   ========================================================= */
+
+.location-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.delete-location-btn {
+  /* display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 11px 17px;
+
+  border: 1px solid rgba(255, 90, 90, 0.35);
+  border-radius: 10px; */
+
+  background: rgba(130, 25, 35, 0.35);
+
+  color: #fff;
+
+  /* font-size: 14px;
+  font-weight: 600; */
+
+  /* cursor: pointer; */
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.delete-location-btn:hover {
+  background: rgba(180, 35, 45, 0.55);
+  border-color: rgba(255, 100, 100, 0.65);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MODAL ELIMINAR
+   ========================================================= */
+
+#deleteLocationModal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 10000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.68);
+
+  backdrop-filter: blur(7px);
+
+  opacity: 1;
+
+  transition: opacity 0.25s ease;
+}
+
+#deleteLocationModal.hidden {
+  display: none;
+}
+
+.delete-location-dialog {
+  width: min(520px, 100%);
+
+  max-height: min(700px, 90vh);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(24, 35, 48, 0.98),
+    rgba(12, 20, 30, 0.98)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.delete-location-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.delete-location-header > div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.delete-location-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(220, 50, 60, 0.16);
+
+  font-size: 20px;
+}
+
+.delete-location-header h2 {
+  margin: 0;
+
+  color: #fff;
+
+  font-size: 18px;
+}
+
+.delete-location-header p {
+  margin: 3px 0 0;
+
+  color: rgba(255, 255, 255, 0.58);
+
+  font-size: 13px;
+}
+
+.modal-close-btn {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.delete-location-content {
+  padding: 18px 20px;
+
+  overflow-y: auto;
+}
+
+.delete-location-info {
+  margin-bottom: 13px;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   LISTA
+   ========================================================= */
+
+.delete-locations-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  max-height: 350px;
+
+  overflow-y: auto;
+
+  padding-right: 3px;
+}
+
+.delete-location-item {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 12px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.delete-location-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.delete-location-item.selected {
+  background: rgba(220, 55, 65, 0.12);
+
+  border-color: rgba(240, 80, 90, 0.4);
+}
+
+.delete-location-checkbox {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+
+  accent-color: #e0525d;
+
+  cursor: pointer;
+}
+
+.delete-location-data {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.delete-location-id {
+  color: #ff8b93;
+
+  font-family: monospace;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+.delete-location-name {
+  color: #fff;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.delete-location-coordinates {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-family: monospace;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   AVISO
+   ========================================================= */
+
+.delete-location-warning {
+  margin-top: 15px;
+
+  padding: 11px 13px;
+
+  border-radius: 10px;
+
+  background: rgba(240, 150, 40, 0.09);
+
+  border: 1px solid rgba(240, 150, 40, 0.25);
+
+  color: rgba(255, 210, 150, 0.9);
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+.delete-location-warning.hidden {
+  display: none;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.delete-location-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 15px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-secondary-btn,
+.delete-confirm-btn {
+  min-height: 40px;
+
+  padding: 9px 15px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.modal-secondary-btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.delete-confirm-btn {
+  border: 1px solid rgba(255, 80, 90, 0.35);
+
+  background: rgba(180, 35, 45, 0.45);
+
+  color: #fff;
+}
+
+.delete-confirm-btn:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
+}
+
+.delete-confirm-btn:not(:disabled):hover {
+  background: rgba(210, 45, 55, 0.65);
+}
+
+/* =========================================================
+   ESTADOS
+   ========================================================= */
+
+.loading-locations,
+.empty-locations {
+  padding: 25px;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 13px;
+}
+
+.loading-locations {
+  animation: pulseLoading 1.4s infinite;
+}
+
+@keyframes pulseLoading {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .location-actions {
+    width: 100%;
+  }
+
+  .location-actions button {
+    flex: 1;
+  }
+
+  #deleteLocationModal {
+    align-items: flex-end;
+
+    padding: 0;
+  }
+
+  .delete-location-dialog {
+    width: 100%;
+
+    max-height: 90vh;
+
+    border-radius: 18px 18px 0 0;
+  }
+
+  .delete-location-list {
+    max-height: 45vh;
+  }
+
+  .delete-location-footer {
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
   }
 }

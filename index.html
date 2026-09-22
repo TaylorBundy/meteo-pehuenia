@@ -76,13 +76,22 @@
             <select id="locationSelect">
               <option value="">Cargando ubicaciones...</option>
             </select>
-            <button
-              type="button"
-              class="add-location-btn"
-              onclick="abrirModalUbicacion()"
-            >
-              ＋ Agregar ubicación
-            </button>
+            <div class="buttonContainer">
+              <button
+                type="button"
+                class="add-location-btn"
+                onclick="abrirModalUbicacion()"
+              >
+                ＋ Agregar ubicación
+              </button>
+              <button
+                type="button"
+                class="delete-location-btn"
+                onclick="abrirModalEliminarUbicacion()"
+              >
+                🗑️ Eliminar ubicación
+              </button>
+            </div>
           </div>
         </section>
 
@@ -428,6 +437,65 @@
             <button type="submit" class="save-btn">💾 Guardar ubicación</button>
           </div>
         </form>
+      </div>
+    </div>
+    <div id="deleteLocationModal" class="location-modal hidden">
+      <div class="delete-location-dialog">
+        <div class="delete-location-header">
+          <div>
+            <span class="delete-location-icon">🗑️</span>
+
+            <div>
+              <h2>Eliminar ubicaciones</h2>
+              <p>Seleccioná una o más ubicaciones</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="closeDeleteLocationModal"
+            class="modal-close-btn"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="delete-location-content">
+          <div class="delete-location-info">
+            Seleccioná las ubicaciones que querés eliminar del archivo JSON.
+          </div>
+
+          <div id="deleteLocationsList" class="delete-locations-list">
+            <div class="loading-locations">Cargando ubicaciones...</div>
+          </div>
+
+          <div
+            id="deleteLocationWarning"
+            class="delete-location-warning hidden"
+          >
+            ⚠️ Las ubicaciones seleccionadas serán eliminadas permanentemente
+            del JSON.
+          </div>
+        </div>
+
+        <div class="delete-location-footer">
+          <button
+            type="button"
+            id="cancelDeleteLocation"
+            class="modal-secondary-btn"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            id="confirmDeleteLocations"
+            class="delete-confirm-btn"
+            disabled
+          >
+            🗑️ Eliminar seleccionadas
+          </button>
+        </div>
       </div>
     </div>
   </body>

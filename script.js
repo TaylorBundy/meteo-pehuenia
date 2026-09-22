@@ -51,6 +51,350 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+// =========================================================
+// MODAL ELIMINAR UBICACIONES
+// =========================================================
+
+const deleteLocationModal = document.getElementById("deleteLocationModal");
+
+const closeDeleteLocationModal = document.getElementById(
+  "closeDeleteLocationModal",
+);
+
+const cancelDeleteLocation = document.getElementById("cancelDeleteLocation");
+
+const confirmDeleteLocations = document.getElementById(
+  "confirmDeleteLocations",
+);
+
+const deleteLocationsList = document.getElementById("deleteLocationsList");
+
+const deleteLocationWarning = document.getElementById("deleteLocationWarning");
+
+// =========================================================
+// ABRIR
+// =========================================================
+
+async function abrirModalEliminarUbicacion() {
+  deleteLocationModal.classList.remove("hidden");
+
+  document.body.style.overflow = "hidden";
+
+  await cargarListaEliminarUbicaciones();
+}
+
+// =========================================================
+// CERRAR
+// =========================================================
+
+function cerrarModalEliminarUbicacion() {
+  deleteLocationModal.classList.add("hidden");
+
+  document.body.style.overflow = "";
+
+  limpiarSeleccionEliminar();
+}
+
+// =========================================================
+// EVENTOS
+// =========================================================
+
+closeDeleteLocationModal.addEventListener(
+  "click",
+  cerrarModalEliminarUbicacion,
+);
+
+cancelDeleteLocation.addEventListener("click", cerrarModalEliminarUbicacion);
+
+deleteLocationModal.addEventListener("click", (event) => {
+  if (event.target === deleteLocationModal) {
+    cerrarModalEliminarUbicacion();
+  }
+});
+
+// =========================================================
+// ESC
+// =========================================================
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    !deleteLocationModal.classList.contains("hidden")
+  ) {
+    cerrarModalEliminarUbicacion();
+  }
+});
+
+async function cargarListaEliminarUbicaciones() {
+  deleteLocationsList.innerHTML = `
+        <div class="loading-locations">
+            Cargando ubicaciones...
+        </div>
+    `;
+
+  confirmDeleteLocations.disabled = true;
+
+  try {
+    const respuesta = await fetch(`${API_URL}/api/ubicaciones`);
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron obtener las ubicaciones.");
+    }
+
+    const resultado = await respuesta.json();
+
+    if (!resultado.ok) {
+      throw new Error(resultado.error || "Error obteniendo ubicaciones.");
+    }
+
+    // Actualizamos también el array global
+    ubicaciones = resultado.ubicaciones;
+
+    mostrarListaEliminar(ubicaciones);
+  } catch (error) {
+    console.error("Error cargando ubicaciones:", error);
+
+    deleteLocationsList.innerHTML = `
+            <div class="empty-locations">
+                ❌ ${error.message}
+            </div>
+        `;
+  }
+}
+
+function mostrarListaEliminar(lista) {
+  deleteLocationsList.innerHTML = "";
+
+  if (!Array.isArray(lista) || lista.length === 0) {
+    deleteLocationsList.innerHTML = `
+            <div class="empty-locations">
+                No hay ubicaciones para eliminar.
+            </div>
+        `;
+
+    return;
+  }
+
+  lista.forEach((ubicacion) => {
+    const item = document.createElement("label");
+
+    item.className = "delete-location-item";
+
+    item.innerHTML = `
+
+            <input
+                type="checkbox"
+                class="delete-location-checkbox"
+                value="${escapeHtml(ubicacion.id)}"
+            >
+
+            <div class="delete-location-data">
+
+                <span class="delete-location-id">
+                    ${escapeHtml(ubicacion.id)}
+                </span>
+
+                <span class="delete-location-name">
+                    ${escapeHtml(ubicacion.nombre)}
+                </span>
+
+                <span class="delete-location-coordinates">
+                    ${ubicacion.latitud},
+                    ${ubicacion.longitud}
+                </span>
+
+            </div>
+
+        `;
+
+    const checkbox = item.querySelector(".delete-location-checkbox");
+
+    checkbox.addEventListener("change", () => {
+      item.classList.toggle("selected", checkbox.checked);
+
+      actualizarEstadoEliminar();
+    });
+
+    deleteLocationsList.appendChild(item);
+  });
+}
+
+function escapeHtml(valor) {
+  return String(valor)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function obtenerIdsSeleccionados() {
+  return [
+    ...deleteLocationsList.querySelectorAll(
+      ".delete-location-checkbox:checked",
+    ),
+  ].map((checkbox) => checkbox.value);
+}
+
+function actualizarEstadoEliminar() {
+  const ids = obtenerIdsSeleccionados();
+
+  const haySeleccionados = ids.length > 0;
+
+  confirmDeleteLocations.disabled = !haySeleccionados;
+
+  deleteLocationWarning.classList.toggle("hidden", !haySeleccionados);
+
+  if (haySeleccionados) {
+    confirmDeleteLocations.textContent = `🗑️ Eliminar ${ids.length} ubicación${
+      ids.length === 1 ? "" : "es"
+    }`;
+  } else {
+    confirmDeleteLocations.textContent = "🗑️ Eliminar seleccionadas";
+  }
+}
+
+function limpiarSeleccionEliminar() {
+  deleteLocationsList
+    .querySelectorAll(".delete-location-checkbox")
+    .forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+
+  deleteLocationsList
+    .querySelectorAll(".delete-location-item")
+    .forEach((item) => {
+      item.classList.remove("selected");
+    });
+
+  deleteLocationWarning.classList.add("hidden");
+
+  confirmDeleteLocations.disabled = true;
+
+  confirmDeleteLocations.textContent = "🗑️ Eliminar seleccionadas";
+}
+
+confirmDeleteLocations.addEventListener(
+  "click",
+  eliminarUbicacionesSeleccionadas,
+);
+
+async function eliminarUbicacionesSeleccionadas() {
+  const ids = obtenerIdsSeleccionados();
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  const cantidad = ids.length;
+
+  const confirmacion = confirm(
+    `¿Seguro que querés eliminar ${cantidad} ubicación${
+      cantidad === 1 ? "" : "es"
+    }?\n\n` +
+      `Esta acción modificará el archivo ` +
+      `data/ubicaciones.json en GitHub.`,
+  );
+
+  if (!confirmacion) {
+    return;
+  }
+
+  const textoOriginal = confirmDeleteLocations.textContent;
+
+  try {
+    confirmDeleteLocations.disabled = true;
+
+    confirmDeleteLocations.textContent = "⏳ Eliminando...";
+
+    const respuesta = await fetch(`${API_URL}/api/ubicaciones`, {
+      method: "DELETE",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        ids,
+      }),
+    });
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok || !resultado.ok) {
+      throw new Error(
+        resultado.error || "No se pudieron eliminar las ubicaciones.",
+      );
+    }
+
+    // ==============================================
+    // ACTUALIZAR ARRAY GLOBAL
+    // ==============================================
+
+    ubicaciones = resultado.ubicaciones;
+
+    // ==============================================
+    // ACTUALIZAR SELECT PRINCIPAL
+    // ==============================================
+
+    actualizarSelectUbicaciones();
+
+    // ==============================================
+    // CERRAR MODAL
+    // ==============================================
+
+    cerrarModalEliminarUbicacion();
+
+    // ==============================================
+    // MENSAJE
+    // ==============================================
+
+    mostrarMensaje(
+      `✅ ${resultado.eliminadas.length} ubicación${
+        resultado.eliminadas.length === 1 ? "" : "es"
+      } eliminada${
+        resultado.eliminadas.length === 1 ? "" : "s"
+      } correctamente.`,
+    );
+  } catch (error) {
+    console.error("Error eliminando ubicaciones:", error);
+
+    mostrarMensaje(`❌ ${error.message}`, true);
+
+    confirmDeleteLocations.disabled = false;
+
+    confirmDeleteLocations.textContent = textoOriginal;
+  }
+}
+
+function actualizarSelectUbicaciones() {
+  const select = document.getElementById("locationSelect");
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  const opcionInicial = document.createElement("option");
+
+  opcionInicial.value = "";
+
+  opcionInicial.textContent = "Seleccionar ubicación...";
+
+  select.appendChild(opcionInicial);
+
+  ubicaciones.forEach((ubicacion) => {
+    const option = document.createElement("option");
+
+    option.value = ubicacion.id;
+
+    option.textContent = ubicacion.nombre;
+
+    select.appendChild(option);
+  });
+}
+
 async function cargarUbicaciones2() {
   const select = document.getElementById("locationSelect");
 
@@ -134,6 +478,7 @@ async function cargarUbicaciones() {
       }
 
       const resultado = await respuesta.json();
+      console.log(resultado);
 
       if (!resultado.ok) {
         throw new Error(resultado.error);

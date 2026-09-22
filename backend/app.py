@@ -383,6 +383,134 @@ def agregar_ubicacion():
             "error": str(error)
         }), 500
 
+@app.delete("/api/ubicaciones")
+def eliminar_ubicaciones():
+
+    if not GITHUB_TOKEN:
+        return jsonify({
+            "ok": False,
+            "error": "No está configurado GITHUB_TOKEN en Render"
+        }), 500
+
+    try:
+
+        datos = request.get_json(silent=True)
+
+        if not datos:
+            return jsonify({
+                "ok": False,
+                "error": "No se recibieron datos"
+            }), 400
+
+
+        ids = datos.get("ids", [])
+
+
+        if not isinstance(ids, list):
+            return jsonify({
+                "ok": False,
+                "error": "ids debe ser una lista"
+            }), 400
+
+
+        ids = [
+            str(id_).strip()
+            for id_ in ids
+            if str(id_).strip()
+        ]
+
+
+        if not ids:
+            return jsonify({
+                "ok": False,
+                "error": "No se seleccionaron ubicaciones"
+            }), 400
+
+
+        # ================================================
+        # OBTENER JSON ACTUAL
+        # ================================================
+
+        ubicaciones, sha = obtener_archivo_github()
+
+
+        ids_set = set(ids)
+
+
+        # ================================================
+        # UBICACIONES A ELIMINAR
+        # ================================================
+
+        eliminadas = [
+            ubicacion
+            for ubicacion in ubicaciones
+            if str(
+                ubicacion.get("id", "")
+            ) in ids_set
+        ]
+
+
+        if not eliminadas:
+
+            return jsonify({
+                "ok": False,
+                "error": "No se encontraron las ubicaciones seleccionadas"
+            }), 404
+
+
+        # ================================================
+        # NUEVA LISTA
+        # ================================================
+
+        nuevas_ubicaciones = [
+            ubicacion
+            for ubicacion in ubicaciones
+            if str(
+                ubicacion.get("id", "")
+            ) not in ids_set
+        ]
+
+
+        # ================================================
+        # GUARDAR EN GITHUB
+        # ================================================
+
+        nombres = ", ".join(
+            ubicacion.get("nombre", "")
+            for ubicacion in eliminadas
+        )
+
+
+        resultado = guardar_archivo_github(
+            nuevas_ubicaciones,
+            sha,
+            f"Eliminar ubicación(es): {nombres}"
+        )
+
+
+        return jsonify({
+            "ok": True,
+            "mensaje": "Ubicaciones eliminadas correctamente",
+            "eliminadas": eliminadas,
+            "ubicaciones": nuevas_ubicaciones,
+            "commit": resultado
+                .get("commit", {})
+                .get("sha")
+        })
+
+
+    except Exception as error:
+
+        print(
+            "ERROR eliminando ubicaciones:",
+            error
+        )
+
+        return jsonify({
+            "ok": False,
+            "error": str(error)
+        }), 500
+
 
 # ============================================================
 # ARRANQUE

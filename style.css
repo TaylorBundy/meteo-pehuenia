@@ -60,7 +60,8 @@ body::before {
   mask-image: linear-gradient(to bottom, black, transparent 80%);
 }
 
-.add-location-btn {
+.add-location-btn,
+.delete-location-btn {
   width: 100%;
   margin-top: 9px;
 
@@ -767,6 +768,12 @@ footer {
 
 .toast-mensaje.error {
   border-color: rgba(255, 80, 80, 0.5);
+}
+
+.buttonContainer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
 }
 
 /* =========================
