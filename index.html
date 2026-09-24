@@ -24,7 +24,7 @@
       src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
       defer
     ></script>
-    <script src="script.js" defer></script>
+    <script src="script.js" type="module" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -135,24 +135,53 @@
             </div>
           </article>
 
-          <article class="metric panel">
-            <span class="metric-icon">💨</span>
-            <span class="metric-label">Viento</span>
-            <strong id="windSpeed">--</strong>
-            <small>km/h</small>
-            <span id="windDirection" class="metric-extra">--</span>
+          <article class="metric panel" id="vientos">
+            <div class="vientos">
+              <!-- <div class="imgCurrent"> -->
+              <span
+                class="metric-icon"
+                id="dirViento"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind.svg);
+                "
+              ></span>
+              <!-- </div> -->
+              <span class="metric-label">Viento</span>
+              <strong id="windSpeed">--</strong>
+              <small>km/h</small>
+              <span id="windDirection" class="metric-extra">--</span>
+            </div>
+            <div class="vientos">
+              <span
+                class="metric-icon"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind.svg);
+                "
+              ></span>
+              <span class="metric-label">Ráfagas</span>
+              <strong id="windGust">--</strong>
+              <small>km/h</small>
+              <span id="windLevel" class="metric-extra">--</span>
+            </div>
           </article>
 
-          <article class="metric panel">
+          <!-- <article class="metric panel">
             <span class="metric-icon">🌬️</span>
             <span class="metric-label">Ráfagas</span>
             <strong id="windGust">--</strong>
             <small>km/h</small>
             <span id="windLevel" class="metric-extra">--</span>
-          </article>
+          </article> -->
 
           <article class="metric panel">
-            <span class="metric-icon">💧</span>
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/humidity.svg);
+                "
+              ></span>
+            </div>
             <span class="metric-label">Humedad</span>
             <strong id="humidity">--</strong>
             <small>%</small>
@@ -160,7 +189,12 @@
           </article>
 
           <article class="metric panel">
-            <span class="metric-icon">🌧️</span>
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                style="background-image: url(images/rainy\ icon.svg)"
+              ></span>
+            </div>
             <span class="metric-label">Precipitación</span>
             <strong id="precipitation">--</strong>
             <small>mm</small>
@@ -168,7 +202,14 @@
           </article>
 
           <article class="metric panel">
-            <span class="metric-icon">❄️</span>
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/line/snowflake.svg);
+                "
+              ></span>
+            </div>
             <span class="metric-label">Nieve</span>
             <strong id="snowfall">--</strong>
             <small>cm</small>
@@ -176,7 +217,14 @@
           </article>
 
           <article class="metric panel">
-            <span class="metric-icon">☁️</span>
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/cloudy.svg);
+                "
+              ></span>
+            </div>
             <span class="metric-label">Nubosidad</span>
             <strong id="cloudCover">--</strong>
             <small>%</small>
@@ -184,10 +232,48 @@
           </article>
 
           <article class="metric panel">
-            <span class="metric-icon">🧭</span>
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                id="presion"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/barometer.svg);
+                "
+              ></span>
+            </div>
             <span class="metric-label">Presión</span>
             <strong id="pressure">--</strong>
             <small>hPa</small>
+            <span class="metric-extra">Nivel del mar</span>
+          </article>
+
+          <article class="metric panel">
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/pressure-high.svg);
+                "
+              ></span>
+            </div>
+            <span class="metric-label">Altitud</span>
+            <strong id="altura">--</strong>
+            <small>mts</small>
+            <span class="metric-extra">Nivel del mar</span>
+          </article>
+
+          <article class="metric panel">
+            <div class="imgCurrent">
+              <span
+                class="metric-icon"
+                style="
+                  background-image: url(https://cdn.meteocons.com/3.0.0-next.10/svg/fill/snowflake.svg);
+                "
+              ></span>
+            </div>
+            <span class="metric-label">Isoterma</span>
+            <strong id="isoterma">--</strong>
+            <small>mts</small>
             <span class="metric-extra">Nivel del mar</span>
           </article>
         </section>

@@ -27,6 +27,8 @@ const locationSelect = document.getElementById("locationSelect");
 const locationList = document.getElementById("editLocationsList");
 const uvicono = document.getElementById("uvIcon");
 const plataforma = navigator.userAgent;
+const dirViento = document.getElementById("dirViento");
+const indPresion = document.getElementById("presion");
 
 const sun = {
   sunrise: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/sunrise.svg",
@@ -42,6 +44,37 @@ const sun = {
   uv9: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-9.svg",
   uv10: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-10.svg",
   uv11: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/uv-index-11.svg",
+  termoSol:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thermometer-sun.svg",
+  termoSnow:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thermometer-snow.svg",
+  termoLluvia:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/thermometer-raindrop.svg",
+  presionAlta:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/barometer-high.svg",
+  presionModerada:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/barometer-moderate.svg",
+  presionBaja:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/barometer-low.svg",
+  altitud: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/pressure-high.svg",
+  copoNieve: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/snowflake.svg",
+  humedad: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/humidity.svg",
+  gotaAgua: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/raindrop.svg",
+  gotasAgua: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/raindrops.svg",
+  norte:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-n.svg",
+  noreste:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-ne.svg",
+  este: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-e.svg",
+  sureste:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-se.svg",
+  sur: "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-s.svg",
+  suroeste:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-sw.svg",
+  oeste:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-w.svg",
+  noroeste:
+    "https://cdn.meteocons.com/3.0.0-next.10/svg/fill/wind-direction-nw.svg",
 };
 
 let selectedLocation = { ...DEFAULT_LOCATION };
@@ -1110,7 +1143,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setCoordinateInputs();
   updateLocationHeader();
   cargarUbicaciones();
-  loadWeather();
+  //loadWeather();
 
   $("btnRefresh").addEventListener("click", loadWeather);
   $("chartMode").addEventListener("change", renderChart);
@@ -1167,6 +1200,7 @@ async function loadWeather() {
         "wind_speed_10m",
         "wind_direction_10m",
         "wind_gusts_10m",
+        "freezing_level_height",
       ].join(","),
       daily: [
         "weather_code",
@@ -1197,7 +1231,10 @@ async function loadWeather() {
     if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
     weatherData = await response.json();
-    // console.log(weatherData);
+    console.log(weatherData);
+    const isoterma = obtenerIsoterma0(weatherData, 0);
+
+    console.log("Isoterma 0 °C:", isoterma, "m");
     momento = determinarDiaNoche(weatherData);
     // console.log(momento);
     renderAll();
@@ -1213,6 +1250,16 @@ async function loadWeather() {
   }
 }
 
+function obtenerIsoterma0(weatherData, indice) {
+  const altura = weatherData.hourly.freezing_level_height[indice];
+
+  if (altura == null) {
+    return null;
+  }
+
+  return Math.round(altura);
+}
+
 function renderAll() {
   renderCurrent();
   renderActivity();
@@ -1220,6 +1267,22 @@ function renderAll() {
   renderDaily();
   renderSun();
   renderChart();
+}
+
+function clasificarPresion(presion) {
+  if (presion == null || isNaN(presion)) {
+    return null;
+  }
+
+  if (presion < 1000) {
+    return "baja";
+  }
+
+  if (presion <= 1020) {
+    return "moderada";
+  }
+
+  return "alta";
 }
 
 function renderCurrent() {
@@ -1243,6 +1306,25 @@ function renderCurrent() {
   $("windGust").textContent = round(c.wind_gusts_10m);
   $("windDirection").textContent =
     `${degreesToCompass(c.wind_direction_10m)} · ${round(c.wind_direction_10m)}°`;
+  const direccion = degreesToCompass(c.wind_direction_10m);
+  console.log(direccion);
+  if (direccion === "NE") {
+    dirViento.style.backgroundImage = `url(${sun.noreste})`;
+  } else if (direccion === "E") {
+    dirViento.style.backgroundImage = `url(${sun.este})`;
+  } else if (direccion === "SE") {
+    dirViento.style.backgroundImage = `url(${sun.sureste})`;
+  } else if (direccion === "S") {
+    dirViento.style.backgroundImage = `url(${sun.sur})`;
+  } else if (direccion === "SW") {
+    dirViento.style.backgroundImage = `url(${sun.suroeste})`;
+  } else if (direccion === "W") {
+    dirViento.style.backgroundImage = `url(${sun.oeste})`;
+  } else if (direccion === "NW") {
+    dirViento.style.backgroundImage = `url(${sun.noroeste})`;
+  } else if (direccion === "N") {
+    dirViento.style.backgroundImage = `url(${sun.norte})`;
+  }
   $("windLevel").textContent = windDescription(c.wind_gusts_10m);
 
   $("humidity").textContent = round(c.relative_humidity_2m);
@@ -1257,6 +1339,21 @@ function renderCurrent() {
   $("visibility").textContent =
     `Visib.: ${formatVisibility(h.visibility[idx])}`;
   $("pressure").textContent = round(c.pressure_msl);
+  const presion = weatherData.current.pressure_msl;
+
+  const nivelPresion = clasificarPresion(presion);
+  if (nivelPresion === "baja") {
+    indPresion.style.backgroundImage = `url(${sun.presionBaja})`;
+  } else if (nivelPresion === "moderada") {
+    indPresion.style.backgroundImage = `url(${sun.presionModerada})`;
+  } else if (nivelPresion === "alta") {
+    indPresion.style.backgroundImage = `url(${sun.presionAlta})`;
+  }
+
+  console.log(presion, nivelPresion);
+  $("altura").textContent = round(weatherData.elevation);
+  const isoterma = obtenerIsoterma0(weatherData, 0);
+  $("isoterma").textContent = round(isoterma);
 
   $("updatedTime").textContent = formatTime(c.time);
   $("elevation").textContent = `${round(weatherData.elevation)} m`;
@@ -2022,14 +2119,14 @@ function capitalize(text) {
   return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+// function escapeHtml(value) {
+//   return String(value)
+//     .replaceAll("&", "&amp;")
+//     .replaceAll("<", "&lt;")
+//     .replaceAll(">", "&gt;")
+//     .replaceAll('"', "&quot;")
+//     .replaceAll("'", "&#039;");
+// }
 
 // ================================================================================
 // Función para limpiar los campos de un formulario, restableciendo su estado inicial
