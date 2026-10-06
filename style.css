@@ -446,10 +446,10 @@ main {
 .metric-icon {
   font-size: 25px;
   height: 35px;
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  padding: 30%;
+  padding: 40%;
 }
 .metric-label {
   color: var(--muted);
@@ -1101,6 +1101,7 @@ footer {
 
   .metric-icon {
     font-size: 20px;
+    display: flex;
   }
 
   .metric-label {
